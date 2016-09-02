@@ -15,9 +15,7 @@ Mirai made a lunatic! RUN!
 
 initial_extensions = [
     'cogs.meta',
-    'cogs.rng',
     'cogs.mod',
-    'cogs.profile',
     'cogs.tags',
     'cogs.lounge',
     'cogs.repl',
@@ -96,7 +94,7 @@ async def do(ctx, times : int, *, command):
 @bot.command()
 async def changelog():
     """Gives a URL to the current bot changelog."""
-    await bot.say('https://discord.gg/0118rJdtd1rVJJfuI')
+    await bot.say('https://discord.gg/hmCEQ')
 
 def load_credentials():
     with open('credentials.json') as f:
