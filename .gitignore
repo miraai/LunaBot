@@ -94,7 +94,4 @@ ENV/
 .ropeproject
 
 ~*
-tags.json
-credentials.json
-stars.json
-luna.log
+.json
