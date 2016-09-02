@@ -1,9 +1,11 @@
 from discord.ext import commands
 import discord.utils
 
+#my owner id
 def is_owner_check(message):
     return message.author.id == '173502573205127170'
 
+#if its correct one
 def is_owner():
     return commands.check(lambda ctx: is_owner_check(ctx.message))
 
@@ -17,6 +19,7 @@ def is_owner():
 # the permissions required for them.
 # Of course, the owner will always be able to execute commands.
 
+#checks permisisons
 def check_permissions(ctx, perms):
     msg = ctx.message
     if is_owner_check(msg):

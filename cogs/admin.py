@@ -20,10 +20,10 @@ class Admin:
         try:
             self.bot.load_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
+            await self.bot.say('\nModule could not be loaded.')
             await self.bot.say('{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.say('\N{OK HAND SIGN}')
+            await self.bot.say('\nModule has been loaded.')
 
     @commands.command(hidden=True)
     @checks.is_owner()
@@ -32,10 +32,10 @@ class Admin:
         try:
             self.bot.unload_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
+            await self.bot.say('\nModule could not be unloaded.')
             await self.bot.say('{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.say('\N{OK HAND SIGN}')
+            await self.bot.say('\nModule has been unloaded.')
 
     @commands.command(name='reload', hidden=True)
     @checks.is_owner()
@@ -45,10 +45,10 @@ class Admin:
             self.bot.unload_extension(module)
             self.bot.load_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
+            await self.bot.say('\nModule could not be reloaded.')
             await self.bot.say('{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.say('\N{OK HAND SIGN}')
+            await self.bot.say('\nModule has been reloaded.')
 
     @commands.command(pass_context=True, hidden=True)
     @checks.is_owner()
@@ -79,5 +79,14 @@ class Admin:
 
         await self.bot.say(python.format(result))
 
+    # so i desperately tried to change the game, and it kinda works, but it doesnt really, and im confused okay
+    @commands.command(pass_context=True)
+    async def game(self, ctx, *game):
+        if ctx.message.channel.permissions_for(ctx.message.author).administrator:
+            gameName = ' '.join(game)
+            await self.bot.change_status(game=discord.Game(name=gameName))
+            await self.bot.say('**Ok.** I changed the game to **{0}**'.format(gameName))
+        else:
+            await self.bot.say('**No.**! Admin only command')
 def setup(bot):
     bot.add_cog(Admin(bot))
