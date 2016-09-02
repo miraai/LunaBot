@@ -10,7 +10,7 @@ import sys
 from collections import Counter
 
 description = """
-Hello! I am a bot written by Danny to provide some nice utilities.
+Mirai made a lunatic! RUN!
 """
 
 initial_extensions = [
