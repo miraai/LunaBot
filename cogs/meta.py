@@ -266,7 +266,7 @@ class Meta:
     @commands.command()
     async def join(self):
         """Joins a server."""
-        msg = 'It is no longer possible to ask me to join via invite. So use this URL instead.\n\n'
+        msg = 'If you want me to go crazy in your server, use this URL: \n\n'
         perms = discord.Permissions.none()
         perms.read_messages = True
         perms.send_messages = True

@@ -338,7 +338,7 @@ class Stars:
 
             db['janitor'] = minutes * 60.0
             self.janitor_tasks[guild_id] = self.bot.loop.create_task(self.janitor(guild_id))
-            await self.bot.say('Remember to \N{PUT LITTER IN ITS PLACE SYMBOL}')
+            await self.bot.say('Remember to cleanup the starboard!')
 
         await self.stars.put(guild_id, db)
 
@@ -366,7 +366,7 @@ class Stars:
             return
 
         await self.clean_starboard(guild_id, stars)
-        await self.bot.say('\N{PUT LITTER IN ITS PLACE SYMBOL}')
+        await self.bot.say('Starboard has been cleaned!')
 
     @star.command(pass_context=True, no_pm=True, name='who')
     async def star_who(self, ctx, message: int):

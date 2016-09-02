@@ -228,7 +228,7 @@ class API:
         role = await self.bot.create_role(server, name=role_name, permissions=discord.Permissions.none())
         feeds[name] = role.id
         await self.feeds.put(channel.id, feeds)
-        await self.bot.say('\u2705')
+        await self.bot.say('The feed has been created!')
 
     @_feeds.command(name='delete', aliases=['remove'], pass_context=True)
     @commands.has_permissions(manage_roles=True)
