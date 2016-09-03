@@ -97,14 +97,17 @@ class Admin:
     @commands.command(pass_context=True)
     @checks.is_owner()
     async def avatar(self, ctx, url: str):
-            '''Sets new avatar for Luna'''
-            async with aiohttp.get(''.join(url)) as img:
-                with open('tempAva.png', 'wb') as f:
-                    f.write(await img.read())
-            with open('tempAva.png', 'rb') as f:
-                await self.bot.edit_profile(avatar=f.read())
-            asyncio.sleep(2)
-            await self.bot.say('**Ok!** New avatar set!')
+        '''Sets new avatar for Luna'''
+        #async with aiohttp.get(''.join(url)) as img:
+        #   with open('tempAva.png', 'wb') as f:
+        #       f.write(await img.read())
+        #with open('tempAva.png', 'rb') as f:
+        #                 await self.bot.edit_profile(avatar=f.read())
+        #asyncio.sleep(2)
+        #await self.bot.say('**Ok!** New avatar set!')
+        async with aiohttp.get(''.join(url)) as img:
+            await self.bot.edit_profile(avatar = await img.read())
+        await self.bot.say('**Ok!** New avatar set!')
 
     @commands.command(pass_context=True)
     @checks.is_owner()
