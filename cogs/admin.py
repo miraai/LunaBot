@@ -1,7 +1,10 @@
+import aiohttp
 from discord.ext import commands
 from .utils import checks
 import discord
 import inspect
+import asyncio
+
 
 # to expose to the eval command
 import datetime
@@ -88,5 +91,34 @@ class Admin:
             await self.bot.say('**Ok.** I changed the game to **{0}**'.format(gameName))
         else:
             await self.bot.say('**No.**! Admin only command')
+
+
+    #this should change bot's avatar, like, who knows what it does really
+    @commands.command(pass_context=True)
+    @checks.is_owner()
+    async def avatar(self, ctx, url: str):
+            '''Sets new avatar for Luna'''
+            async with aiohttp.get(''.join(url)) as img:
+                with open('tempAva.png', 'wb') as f:
+                    f.write(await img.read())
+            with open('tempAva.png', 'rb') as f:
+                await self.bot.edit_profile(avatar=f.read())
+            asyncio.sleep(2)
+            await self.bot.say('**Ok!** New avatar set!')
+
+    @commands.command(pass_context=True)
+    @checks.is_owner()
+    async def name(self, ctx, *name):
+        '''Changes Bot Name'''
+        if ctx.message.channel.permissions_for(ctx.message.author).administrator:
+            name = ' '.join(name)
+            await self.bot.edit_profile(username=name)
+            msg = '**Ok!** New name set: **{0}**'.format(name)
+        else:
+            msg = '**No!** Owner Only command!'
+
+        await self.bot.say(msg)
+
+
 def setup(bot):
     bot.add_cog(Admin(bot))
