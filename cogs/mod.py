@@ -358,7 +358,6 @@ class Mod:
     @checks.admin_or_permissions(manage_roles=True)
     async def addroles(self, ctx, member : discord.Member, *roles: discord.Role):
         """Adds multiple roles to the user
-
         Luna sometimes hates your role names."""
         try:
             for _, role in enumerate(roles):

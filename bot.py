@@ -29,6 +29,7 @@ initial_extensions = [
     'cogs.stars',
     'cogs.admin',
     'cogs.buttons',
+    'cogs.customreactions',
 ]
 #so these should be kinda modules/plugins
 
