@@ -46,6 +46,12 @@ class Meta:
         """Displays my intro message."""
         await self.bot.say('Hello! I\'m a bot and I\'m a lunatic! Mirai#3133 made me.')
 
+    #doesnt do anything, just for funzies
+    @commands.command(hidden=True)
+    async def night(self):
+        """Displays my intro message."""
+        await self.bot.say('Good night! :crescent_moon:')
+
     @commands.command()
     async def charinfo(self, *, characters: str):
         """Shows you information about a number of characters.

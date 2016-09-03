@@ -1,5 +1,6 @@
 from discord.ext import commands
-from .utils import config, checks
+from cogs.utils import config
+from cogs.utils import checks
 from collections import Counter
 import re
 import discord
@@ -340,6 +341,45 @@ class Mod:
         else:
             await self.bot.say('\U0001f44c')
 
+    #changes the name of the role
+    #NOTE: Currently CANNOT change default bot role name (BotName=DafaultRoleName)
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manage_roles=True)
+    async def renrole(self, ctx, role: discord.Role, name: str):
+        """Changes the name of a role."""
+        try:
+            await self.bot.edit_role(ctx.message.server, role, name=name)
+        except discord.Forbidden:
+            await self.bot.say('The bot must have Manage Roles permissions to use this.')
+        else:
+            await self.bot.say('Name of the role has been changed!')
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manage_roles=True)
+    async def addroles(self, ctx, member : discord.Member, *roles: discord.Role):
+        """Adds multiple roles to the user
+
+        Luna sometimes hates your role names."""
+        try:
+            for _, role in enumerate(roles):
+                await self.bot.add_roles(member, role)
+        except discord.Forbidden:
+            await self.bot.say('You need manage roles permission')
+        else:
+            await self.bot.say('**Ok!** Roles added!')
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manage_roles=True)
+    async def addrole(self, ctx, member: discord.Member, role: discord.Role):
+        """Adds a role to the user"""
+        try:
+            await self.bot.add_roles(member, role)
+        except discord.Forbidden:
+            await self.bot.say('You need manage role permission')
+        else:
+            await self.bot.say('**Ok!** Role added!')
+
+
     @commands.group(pass_context=True, no_pm=True, aliases=['purge'])
     @checks.admin_or_permissions(manage_messages=True)
     async def remove(self, ctx):
@@ -504,6 +544,7 @@ class Mod:
 
         args.search = max(0, min(2000, args.search)) # clamp from 0-2000
         await self.do_removal(ctx.message, args.search, predicate)
+
 
 def setup(bot):
     bot.add_cog(Mod(bot))
