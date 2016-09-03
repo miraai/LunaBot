@@ -93,7 +93,7 @@ class Mod:
 
         ignored.append(channel.id)
         await self.config.put('ignored', ignored)
-        await self.bot.say('\U0001f44c')
+        await self.bot.say('**Done!** The channel is ignored.')
 
     @ignore.command(name='all', pass_context=True)
     @checks.admin_or_permissions(manage_server=True)
@@ -112,7 +112,7 @@ class Mod:
         channels = ctx.message.server.channels
         ignored.extend(c.id for c in channels if c.type == discord.ChannelType.text)
         await self.config.put('ignored', list(set(ignored))) # make unique
-        await self.bot.say('\U0001f44c')
+        await self.bot.say('**Done!** All channels on the server are ignored.')
 
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
     @checks.admin_or_permissions(manage_channels=True)
@@ -138,7 +138,7 @@ class Mod:
                 pass
 
         await self.config.put('ignored', ignored)
-        await self.bot.say('\N{OK HAND SIGN}')
+        await self.bot.say('**Done!** The channels are unignored.')
 
     @unignore.command(name='all', pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_channels=True)
@@ -300,7 +300,7 @@ class Mod:
 
         plonks.append(member.id)
         await self.config.put('plonks', plonks)
-        await self.bot.say('{0.name} has been banned from using the bot.'.format(member))
+        await self.bot.say('**Done!** {0.name} has been banned from using the bot.'.format(member))
 
     @commands.command(no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
@@ -352,7 +352,7 @@ class Mod:
         except discord.Forbidden:
             await self.bot.say('The bot must have Manage Roles permissions to use this.')
         else:
-            await self.bot.say('Name of the role has been changed!')
+            await self.bot.say('**Done!** Name of the role has been changed.')
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
@@ -365,7 +365,7 @@ class Mod:
         except discord.Forbidden:
             await self.bot.say('You need manage roles permission')
         else:
-            await self.bot.say('**Ok!** Roles added!')
+            await self.bot.say('**Done!** Roles added to the user.')
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
@@ -376,8 +376,31 @@ class Mod:
         except discord.Forbidden:
             await self.bot.say('You need manage role permission')
         else:
-            await self.bot.say('**Ok!** Role added!')
+            await self.bot.say('**Done!** Role added to the user.')
 
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manage_roles=True)
+    async def createrole(self, ctx, role : str):
+        """Adds a role to the server"""
+
+        try:
+            await self.bot.create_role(ctx.message.server, name=role)
+        except discord.Forbidden:
+            await self.bot.say('You need manage role permission')
+        else:
+            await self.bot.say('**Done!** Role has been added to the server.')
+            return role
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manage_roles=True)
+    async def removerole(self, ctx, role: discord.Role):
+        """Deletes a role from the server"""
+        try:
+            await self.bot.delete_role(ctx.message.server, role)
+        except discord.Forbidden:
+            await self.bot.say('You need manage role permission')
+        else:
+            await self.bot.say('**Done!** Role has been deleted.')
 
     @commands.group(pass_context=True, no_pm=True, aliases=['purge'])
     @checks.admin_or_permissions(manage_messages=True)
