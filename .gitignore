@@ -94,5 +94,6 @@ ENV/
 .ropeproject
 
 ~*
-.json
-.idea
+*.json
+.idea/**
+credentials.json

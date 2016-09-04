@@ -3,19 +3,7 @@ from datetime import datetime
 import discord
 from .utils import checks
 
-def date(argument):
-    formats = (
-        '%Y/%m/%d',
-        '%Y-%m-%d',
-    )
 
-    for fmt in formats:
-        try:
-            return datetime.strptime(argument, fmt)
-        except ValueError:
-            continue
-
-    raise commands.BadArgument('Cannot convert to date. Expected YYYY/MM/DD or YYYY-MM-DD.')
 
 class Buttons:
     """Buttons that make you feel."""
@@ -23,12 +11,12 @@ class Buttons:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
+    @commands.command()
     async def feelgood(self):
         """press"""
         await self.bot.say('*pressed*')
 
-    @commands.command(hidden=True)
+    @commands.command()
     async def feelbad(self):
         """depress"""
         await self.bot.say('*depressed*')
@@ -36,39 +24,33 @@ class Buttons:
     @commands.command()
     async def love(self):
         """What is love?"""
-        await self.bot.say('http://i.imgur.com/JthwtGA.png')
+        await self.bot.say('http://i.imgur.com/ZSSSMqY.gif')
 
-    @commands.command(hidden=True)
+    @commands.command()
     async def bored(self):
         """boredom looms"""
-        await self.bot.say('http://i.imgur.com/BuTKSzf.png')
+        await self.bot.say('http://i.imgur.com/Vv4QoGy.gif')
 
-    @commands.command(pass_context=True)
-    @checks.mod_or_permissions(manage_messages=True)
-    async def nostalgia(self, ctx, date: date, *, channel: discord.Channel = None):
-        """Pins an old message from a specific date.
+    @commands.command(hidden=True)
+    async def codeworks(self):
+        """code magic"""
+        await self.bot.say('http://i.imgur.com/uz2GLai.gif')
 
-        If a channel is not given, then pins from the channel the
-        command was ran on.
+    @commands.command()
+    async def hello(self):
+        """Displays my intro message."""
+        await self.bot.say('Hello! I\'m a bot and I\'m a lunatic! Mirai#3133 made me.')
 
-        The format of the date must be either YYYY-MM-DD or YYYY/MM/DD.
-        """
+    # doesnt do anything, just for funzies
+    @commands.command()
+    async def night(self):
+        """Good night message."""
+        await self.bot.say('Good night! :crescent_moon:')
 
-        if channel is None:
-            channel = ctx.message.channel
-
-        async for m in self.bot.logs_from(channel, after=date, limit=1):
-            try:
-                await self.bot.pin_message(m)
-            except:
-                await self.bot.say('\N{THUMBS DOWN SIGN} Could not pin message.')
-            else:
-                await self.bot.say('\N{THUMBS UP SIGN} Successfully pinned message.')
-
-    @nostalgia.error
-    async def nostalgia_error(self, error, ctx):
-        if type(error) is commands.BadArgument:
-            await self.bot.say(error)
+    @commands.command()
+    async def morning(self):
+        """Good night message."""
+        await self.bot.say('Good morning! :sunny:')
 
 def setup(bot):
     bot.add_cog(Buttons(bot))

@@ -41,17 +41,6 @@ class Meta:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    async def hello(self):
-        """Displays my intro message."""
-        await self.bot.say('Hello! I\'m a bot and I\'m a lunatic! Mirai#3133 made me.')
-
-    #doesnt do anything, just for funzies
-    @commands.command(hidden=True)
-    async def night(self):
-        """Displays my intro message."""
-        await self.bot.say('Good night! :crescent_moon:')
-
     @commands.command()
     async def charinfo(self, *, characters: str):
         """Shows you information about a number of characters.
@@ -146,6 +135,15 @@ class Meta:
         """Quits the bot."""
         await self.bot.logout()
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def getav(self, ctx, member : discord.Member = None):
+        """Shows member's avatar.
+        If you don't specify a member then the info returned will be yours."""
+        channel = ctx.message.channel
+        if member is None:
+            member = ctx.message.author
+        await self.bot.say(member.avatar_url)
+
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
     async def info(self, ctx, *, member : discord.Member = None):
         """Shows info about a member.
@@ -228,7 +226,7 @@ class Meta:
         entries = [(attr.replace('_', ' ').title(), val) for attr, val in permissions]
         await formats.entry_to_code(self.bot, entries)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['perms'], pass_context=True, no_pm=True)
     async def permissions(self, ctx, *, member : discord.Member = None):
         """Shows a member's permissions.
 
@@ -241,7 +239,7 @@ class Meta:
 
         await self.say_permissions(member, channel)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['botperms'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def botpermissions(self, ctx):
         """Shows the bot's permissions.
@@ -310,7 +308,7 @@ class Meta:
         """Tells you information about the bot itself."""
         revision = os.popen(r'git show -s HEAD --format="%s (%cr)"').read().strip()
         result = ['**About Me:**']
-        result.append('- Author: Mirai#3133 (Discord ID: 173502573205127170)')
+        result.append('- Author: Mirai [ID: 173502573205127170]')
         result.append('- Library: discord.py (Python)')
         result.append('- Latest Change: {}'.format(revision))
         result.append('- Uptime: {}'.format(self.get_bot_uptime()))
@@ -329,7 +327,7 @@ class Meta:
         result.append('- Unique Members: {} ({} online)'.format(len(unique_members), unique_online))
         result.append('- {} text channels, {} voice channels'.format(text, voice))
         result.append('')
-        result.append('Luna server: https://discord.gg/hmCEQ')
+        result.append('Luna server: https://discord.gg/PDmtxWq')
         await self.bot.say('\n'.join(result))
 
     @commands.command(rest_is_raw=True, hidden=True)

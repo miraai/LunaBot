@@ -6,7 +6,7 @@ import json
 import asyncio
 
 class Stars:
-    """A starboard to upvote posts obviously.
+    """A moonboard to upvote posts obviously.
 
     To make use of this feature it is required that Developer Mode
     is enabled in the setting so you can copy message IDs. To do so,
@@ -18,9 +18,9 @@ class Stars:
 
         # config format: (yeah, it's not ideal or really any good but whatever)
         # <guild_id> : <data> where <data> is
-        # channel: <starboard channel id>
+        # channel: <moonboard channel id>
         # message_id: [bot_message, [starred_user_ids]]
-        self.stars = config.Config('stars.json')
+        self.stars = config.Config('moon.json')
 
         # cache message objects to save Discord some HTTP requests.
         self._message_cache = {}
@@ -61,13 +61,13 @@ class Stars:
 
     def star_emoji(self, stars):
         if 5 >= stars >= 0:
-            return '\N{WHITE MEDIUM STAR}'
+            return ':waning_crescent_moon:'
         elif 10 >= stars >= 6:
-            return '\N{GLOWING STAR}'
+            return ':first_quarter_moon:'
         elif 25 >= stars >= 11:
-            return '\N{DIZZY SYMBOL}'
+            return ':last_quarter_moon:'
         else:
-            return '\N{SPARKLES}'
+            return ':full_moon:'
 
     def emoji_message(self, msg, starrers):
         # we should hope that the message length is not too big for this to work.
@@ -91,7 +91,7 @@ class Stars:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(administrator=True)
-    async def starboard(self, ctx, *, name: str = 'starboard'):
+    async def moonboard(self, ctx, *, name: str = 'moonboard'):
         """Sets up the starboard for this server.
 
         This creates a new channel with the specified name
@@ -109,7 +109,7 @@ class Stars:
         stars = self.stars.get(server.id, {})
         old_starboard = self.bot.get_channel(stars.get('channel'))
         if old_starboard is not None:
-            fmt = 'This channel already has a starboard ({.mention})'
+            fmt = 'This channel already has a moonboard ({.mention})'
             await self.bot.say(fmt.format(old_starboard))
             return
 
@@ -128,13 +128,13 @@ class Stars:
         try:
             channel = await self.bot.create_channel(*args)
         except discord.Forbidden:
-            await self.bot.say('\N{NO ENTRY SIGN} I do not have permissions to create a channel.')
+            await self.bot.say('**Error!** I do not have permissions to create a channel.')
         except discord.HTTPException:
-            await self.bot.say('\N{PISTOL} This channel name is bad or an unknown error happened.')
+            await self.bot.say('**Error!** This channel name is bad or an unknown error happened.')
         else:
             stars['channel'] = channel.id
             await self.stars.put(server.id, stars)
-            await self.bot.say('\N{GLOWING STAR} Starboard created at ' + channel.mention)
+            await self.bot.say('**Done!** Moonboard created at ' + channel.mention)
 
     async def get_message(self, channel, mid):
         cached = self._message_cache.get(mid)
@@ -214,10 +214,10 @@ class Stars:
             pass # the content was probably too big so just ignore this edit.
 
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
-    async def star(self, ctx, message: int):
-        """Stars a message via message ID.
+    async def moon(self, ctx, message: int):
+        """Moons a message via message ID.
 
-        To star a message you should click on the cog
+        To moon a message you should click on the cog
         on a message and then click "Copy ID". You must have
         Developer Mode enabled to get that functionality.
 
@@ -231,43 +231,43 @@ class Stars:
         message = str(message)
         starboard = self.bot.get_channel(db.get('channel'))
         if starboard is None:
-            await self.bot.say('\N{WARNING SIGN} Starboard channel not found.')
+            await self.bot.say('**Error** Moonboard channel not found.')
             return
 
         stars = db.get(message, [None, []]) # ew, I know.
         starrers = stars[1]
 
         if starrer.id in starrers:
-            await self.bot.say('\N{NO ENTRY SIGN} You already starred this message.')
+            await self.bot.say('**Error** You already have a moon on this message.')
             return
 
         msg = await self.get_message(ctx.message.channel, message)
         if msg is None:
-            await self.bot.say('\N{BLACK QUESTION MARK ORNAMENT} This message could not be found.')
+            await self.bot.say('**Error** This message could not be found.')
             return
 
         if starrer.id == msg.author.id:
-            await self.bot.say('\N{NO ENTRY SIGN} You cannot star your own message.')
+            await self.bot.say('**Error** You cannot moon your own message.')
             return
 
         if msg.channel.id == starboard.id:
-            await self.bot.say('\N{NO ENTRY SIGN} You cannot star messages in the starboard.')
+            await self.bot.say('**Error** You cannot star messages in the moonboard.')
             return
 
         # check if the message is older than 7 days
         seven_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=7)
         if msg.timestamp < seven_days_ago:
-            await self.bot.say('\N{NO ENTRY SIGN} This message is older than 7 days.')
+            await self.bot.say('**Error** This message is older than 7 days.')
             return
 
-        # at this point we can assume that the user did not star the message
-        # and that it is relatively safe to star
+        # at this point we can assume that the user did not moon the message
+        # and that it is relatively safe to moon
         to_send = self.emoji_message(msg, len(starrers) + 1)
         if len(to_send) > 2000:
-            await self.bot.say('\N{NO ENTRY SIGN} This message is too big to be starred.')
+            await self.bot.say('**Error** This message is too big for the moon!.')
             return
 
-        # try to remove the star message since it's 'spammy'
+        # try to remove the moon message since it's 'spammy'
         try:
             await self.bot.delete_message(ctx.message)
         except:
@@ -276,7 +276,7 @@ class Stars:
         starrers.append(starrer.id)
         db[message] = stars
 
-        # freshly starred
+        # freshly mooned
         if stars[0] is None:
             sent = await self.bot.send_message(starboard, to_send)
             stars[0] = sent.id
@@ -285,9 +285,9 @@ class Stars:
 
         bot_msg = await self.get_message(starboard, stars[0])
         if bot_msg is None:
-            await self.bot.say('\N{BLACK QUESTION MARK ORNAMENT} Expected to be {0.mention} but is not.'.format(starboard))
+            await self.bot.say('**Error!** Expected to be {0.mention} but is not.'.format(starboard))
 
-            # remove the entry from the starboard cache since someone deleted it.
+            # remove the entry from the moonboard cache since someone deleted it.
             # i.e. they did a 'clear' on the stars.
             # they can go through this process again if they *truly* want to star it.
             db.pop(message, None)
@@ -297,19 +297,19 @@ class Stars:
         await self.bot.edit_message(bot_msg, to_send)
         await self.stars.put(guild_id, db)
 
-    @star.error
+    @moon.error
     async def star_error(self, error, ctx):
         if type(error) is commands.BadArgument:
-            await self.bot.say('That is not a valid message ID. Use Developer Mode to get the Copy ID option.')
+            await self.bot.say('**Error!** That is not a valid message ID. Use Developer Mode to get the Copy ID option.')
 
-    @star.command(name='janitor', pass_context=True, no_pm=True)
+    @moon.command(name='janitor', pass_context=True, no_pm=True)
     @checks.admin_or_permissions(administrator=True)
-    async def star_janitor(self, ctx, minutes: float = 0.0):
-        """Set the starboard's janitor clean rate.
+    async def moon_janitor(self, ctx, minutes: float = 0.0):
+        """Set the moonboard's janitor clean rate.
 
-        The clean rate allows the starboard to cleared from single star
+        The clean rate allows the moonboard to cleared from single moon
         messages. By setting a clean rate, every N minutes the bot will
-        routinely cleanup single starred messages from the starboard.
+        routinely cleanup single mooned messages from the moonboard.
 
         Setting the janitor's clean rate to 0 (or below) disables it.
 
@@ -321,7 +321,7 @@ class Stars:
         db = self.stars.get(guild_id, {})
 
         if db.get('channel') is None:
-            await self.bot.say('\N{WARNING SIGN} Starboard channel not found.')
+            await self.bot.say('**Error!** Starboard channel not found.')
             return
 
         def cleanup_task():
@@ -331,23 +331,23 @@ class Stars:
 
         if minutes <= 0.0:
             cleanup_task()
-            await self.bot.say('\N{SQUARED OK} No more cleaning up.')
+            await self.bot.say('**Done!** No more cleaning up.')
         else:
             if 'janitor' in db:
                 cleanup_task()
 
             db['janitor'] = minutes * 60.0
             self.janitor_tasks[guild_id] = self.bot.loop.create_task(self.janitor(guild_id))
-            await self.bot.say('Remember to cleanup the starboard!')
+            await self.bot.say('**Note:** Remember to cleanup the moonboard!')
 
         await self.stars.put(guild_id, db)
 
-    @star.command(name='clean', pass_context=True, no_pm=True)
+    @moon.command(name='clean', pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_messages=True)
-    async def star_clean(self, ctx, stars:int = 1):
-        """Cleans the starboard
+    async def moon_clean(self, ctx, stars:int = 1):
+        """Cleans the moonboard
 
-        This removes messages in the starboard that only have less
+        This removes messages in the moonboard that only have less
         than or equal to the number of specified stars. This defaults to 1.
 
         To continuously do this over a period of time see
@@ -362,14 +362,14 @@ class Stars:
         stars = 1 if stars < 0 else stars
 
         if db.get('channel') is None:
-            await self.bot.say('\N{WARNING SIGN} Starboard channel not found.')
+            await self.bot.say('**Error!** Starboard channel not found.')
             return
 
         await self.clean_starboard(guild_id, stars)
-        await self.bot.say('Starboard has been cleaned!')
+        await self.bot.say('**Done!** Moonboard has been cleaned!')
 
-    @star.command(pass_context=True, no_pm=True, name='who')
-    async def star_who(self, ctx, message: int):
+    @moon.command(pass_context=True, no_pm=True, name='who')
+    async def moon_who(self, ctx, message: int):
         """Show who starred a message.
 
         The ID can either be the starred message ID

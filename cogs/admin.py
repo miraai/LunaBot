@@ -97,14 +97,17 @@ class Admin:
     @commands.command(pass_context=True)
     @checks.is_owner()
     async def avatar(self, ctx, url: str):
-            '''Sets new avatar for Luna'''
-            async with aiohttp.get(''.join(url)) as img:
-                with open('tempAva.png', 'wb') as f:
-                    f.write(await img.read())
-            with open('tempAva.png', 'rb') as f:
-                await self.bot.edit_profile(avatar=f.read())
-            asyncio.sleep(2)
-            await self.bot.say('**Ok!** New avatar set!')
+        '''Sets new avatar for Luna'''
+        #async with aiohttp.get(''.join(url)) as img:
+        #   with open('tempAva.png', 'wb') as f:
+        #       f.write(await img.read())
+        #with open('tempAva.png', 'rb') as f:
+        #                 await self.bot.edit_profile(avatar=f.read())
+        #asyncio.sleep(2)
+        #await self.bot.say('**Ok!** New avatar set!')
+        async with aiohttp.get(''.join(url)) as img:
+            await self.bot.edit_profile(avatar = await img.read())
+        await self.bot.say('**Ok!** New avatar set!')
 
     @commands.command(pass_context=True)
     @checks.is_owner()
@@ -119,6 +122,60 @@ class Admin:
 
         await self.bot.say(msg)
 
+    @commands.command(pass_context=True)
+    @checks.is_owner()
+    async def topic(self, ctx, topic: str):
+        """Sets a channel topic."""
+        try:
+            await self.bot.edit_channel(ctx.message.channel, topic=topic)
+        except discord.Forbidden:
+            await self.bot.say('**Error!** Bot Owner command.')
+        else:
+            await self.bot.say('**Done!** Topic set for this channel.')
+
+    @commands.command(aliases=['cc'], pass_context=True)
+    @checks.is_owner()
+    async def createchannel(self, ctx, name: str):
+        """Creates a new channel"""
+        try:
+            await self.bot.create_channel(ctx.message.server, type=discord.ChannelType.text, name=name)
+        except discord.Forbidden:
+            await self.bot.say('**Error!** You don\' have a permission to do that.')
+        else:
+            await self.bot.say('**Done!** Channel created!')
+
+    @commands.command(aliases=['dc'], pass_context=True)
+    @checks.is_owner()
+    async def deletechannel(self, ctx, channel : discord.Channel):
+        """Deletes a channel"""
+        try:
+            await self.bot.delete_channel(channel)
+        except discord.Forbidden:
+            await self.bot.say('**Error!** You don\' have a permission to do that.')
+        else:
+            await self.bot.say('**Done!** Channel deleted!')
+
+    @commands.command(aliases=['ec'], pass_context=True)
+    @checks.is_owner()
+    async def editchannel(self, ctx, channel : discord.Channel, name: str):
+        """Edit channel's name"""
+        try:
+            await self.bot.edit_channel(channel, name=name)
+        except discord.Forbidden:
+            await self.bot.say('**Error!** You don\' have a permission to do that.')
+        else:
+            await self.bot.say('**Done!** Channel name changed!')
+
+    @commands.command(aliases=['cvc'], pass_context=True)
+    @checks.is_owner()
+    async def createvchannel(self, ctx, name: str):
+        """Creates a new voice channel"""
+        try:
+            await self.bot.create_channel(ctx.message.server, type=discord.ChannelType.voice, name=name)
+        except discord.Forbidden:
+            await self.bot.say('**Error!** You don\' have a permission to do that.')
+        else:
+            await self.bot.say('**Done!** Voice channel created!')
 
 def setup(bot):
     bot.add_cog(Admin(bot))

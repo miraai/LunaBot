@@ -2,13 +2,6 @@ import discord
 from discord.ext import commands
 from cogs.utils import config
 from cogs.utils import checks
-from collections import Counter
-import re
-import asyncio
-import argparse, shlex
-import os
-import json
-import sys
 
 
 class CustomReactions:
@@ -18,7 +11,7 @@ class CustomReactions:
         self.bot = bot
         self.config = config.Config('customs.json', loop=bot.loop)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['acr'], pass_context=True, no_pm=True)
     @checks.is_owner()
     async def addcustom(self, ctx, command : str, text: str):
         """Adds custom reaction."""
@@ -43,6 +36,17 @@ class CustomReactions:
         else:
             await self.bot.say("That reaction does not exist.")
 
+    @commands.command(aliases=['allr'], pass_context=True, no_pm=True)
+    async def reactions(self, ctx):
+        """Shows all custom reactions.
+        """
+        commands = self.config.all()
+        out = '```xl\n'
+        for c in enumerate(commands):
+            out+= str(c[0]+1) +'. ' + str(c[1]) + ': \"' + str(commands[c[1]]) + '\"\n'
+        out += "```"
+        await self.bot.say(out)
+
     #creates a trigger for a custom reaction
     async def on_message(self, message):
         if message.author.bot:
@@ -52,7 +56,7 @@ class CustomReactions:
             return
         await self.bot.send_message(message.channel, text)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['dcr'], pass_context=True, no_pm=True)
     @checks.is_owner()
     async def delcustom(self, cfx, command: str):
         """Deletes a custom reaction."""
