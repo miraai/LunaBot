@@ -49,8 +49,13 @@ class Meta:
     #doesnt do anything, just for funzies
     @commands.command(hidden=True)
     async def night(self):
-        """Displays my intro message."""
+        """Good night message."""
         await self.bot.say('Good night! :crescent_moon:')
+
+    @commands.command(hidden=True)
+    async def morning(self):
+        """Good night message."""
+        await self.bot.say('Good morning! :sunny:')
 
     @commands.command()
     async def charinfo(self, *, characters: str):

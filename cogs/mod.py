@@ -402,6 +402,19 @@ class Mod:
         else:
             await self.bot.say('**Done!** Role has been deleted.')
 
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manage_messages=True)
+    async def pinmsg(self, ctx, message: str):
+        """Pins a message by an ID."""
+        try:
+            #msg = await self.bot.say(message)
+            msg = await self.bot.get_message(ctx.message.channel,message)
+            await self.bot.pin_message(msg)
+        except discord.Forbidden:
+            await self.bot.say('I can\'t pin that message')
+        else:
+            await self.bot.say('Message pinned')
+
     @commands.group(pass_context=True, no_pm=True, aliases=['purge'])
     @checks.admin_or_permissions(manage_messages=True)
     async def remove(self, ctx):
