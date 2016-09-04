@@ -346,7 +346,7 @@ class API:
         Only searches the past 300 cases.
         """
 
-        mod_log = ctx.message.server.get_channel('173201159761297408')
+        mod_log = ctx.message.server.get_channel('222010090226581504')
         entries = []
         async for m in self.bot.logs_from(mod_log, limit=300):
             entry = self.pollr.match(m.content)

@@ -6,6 +6,21 @@ import re
 import discord
 import asyncio
 import argparse, shlex
+from datetime import datetime
+
+def date(argument):
+    formats = (
+        '%Y/%m/%d',
+        '%Y-%m-%d',
+    )
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(argument, fmt)
+        except ValueError:
+            continue
+
+    raise commands.BadArgument('Cannot convert to date. Expected YYYY/MM/DD or YYYY-MM-DD.')
 
 class Arguments(argparse.ArgumentParser):
     def error(self, message):
@@ -213,7 +228,7 @@ class Mod:
 
         await self.bot.say('\n'.join(messages), delete_after=10)
 
-    @commands.command(no_pm=True)
+    @commands.command(aliases=['k'],no_pm=True)
     @checks.admin_or_permissions(kick_members=True)
     async def kick(self, *, member : discord.Member):
         """Kicks a member from the server.
@@ -233,7 +248,7 @@ class Mod:
         else:
             await self.bot.say('\U0001f44c')
 
-    @commands.command(no_pm=True)
+    @commands.command(aliases=['b'],no_pm=True)
     @checks.admin_or_permissions(ban_members=True)
     async def ban(self, *, member : discord.Member):
         """Bans a member from the server.
@@ -253,7 +268,7 @@ class Mod:
         else:
             await self.bot.say('\U0001f44c')
 
-    @commands.command(no_pm=True)
+    @commands.command(aliases=['sb'],no_pm=True)
     @checks.admin_or_permissions(ban_members=True)
     async def softban(self, *, member : discord.Member):
         """Soft bans a member from the server.
@@ -276,7 +291,7 @@ class Mod:
         else:
             await self.bot.say('\U0001f44c')
 
-    @commands.command(no_pm=True)
+    @commands.command(aliases=['p'],no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
     async def plonk(self, *, member : discord.Member):
         """Bans a user from using the bot.
@@ -302,7 +317,7 @@ class Mod:
         await self.config.put('plonks', plonks)
         await self.bot.say('**Done!** {0.name} has been banned from using the bot.'.format(member))
 
-    @commands.command(no_pm=True)
+    @commands.command(aliases=['up'], no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
     async def unplonk(self, *, member : discord.Member):
         """Unbans a user from using the bot.
@@ -321,7 +336,7 @@ class Mod:
             await self.config.put('plonks', plonks)
             await self.bot.say('{0.name} has been unbanned from using the bot.'.format(member))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['col'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def colour(self, ctx, colour : discord.Colour, *, role : discord.Role):
         """Changes the colour of a role.
@@ -343,7 +358,7 @@ class Mod:
 
     #changes the name of the role
     #NOTE: Currently CANNOT change default bot role name (BotName=DafaultRoleName)
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['rr'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def renrole(self, ctx, role: discord.Role, name: str):
         """Changes the name of a role."""
@@ -354,7 +369,7 @@ class Mod:
         else:
             await self.bot.say('**Done!** Name of the role has been changed.')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['ars'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def addroles(self, ctx, member : discord.Member, *roles: discord.Role):
         """Adds multiple roles to the user
@@ -367,7 +382,7 @@ class Mod:
         else:
             await self.bot.say('**Done!** Roles added to the user.')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['ar'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def addrole(self, ctx, member: discord.Member, role: discord.Role):
         """Adds a role to the user"""
@@ -378,7 +393,7 @@ class Mod:
         else:
             await self.bot.say('**Done!** Role added to the user.')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['cr'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def createrole(self, ctx, role : str):
         """Adds a role to the server"""
@@ -391,7 +406,7 @@ class Mod:
             await self.bot.say('**Done!** Role has been added to the server.')
             return role
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(aliases=['remr'], pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_roles=True)
     async def removerole(self, ctx, role: discord.Role):
         """Deletes a role from the server"""
@@ -414,6 +429,33 @@ class Mod:
             await self.bot.say('I can\'t pin that message')
         else:
             await self.bot.say('Message pinned')
+
+    @commands.command(pass_context=True)
+    @checks.mod_or_permissions(manage_messages=True)
+    async def pinmsgdate(self, ctx, date: date, *, channel: discord.Channel = None):
+        """Pins an old message from a specific date.
+
+        If a channel is not given, then pins from the channel the
+        command was ran on.
+
+        The format of the date must be either YYYY-MM-DD or YYYY/MM/DD.
+        """
+
+        if channel is None:
+            channel = ctx.message.channel
+
+        async for m in self.bot.logs_from(channel, after=date, limit=1):
+            try:
+                await self.bot.pin_message(m)
+            except:
+                await self.bot.say('**Error!** Could not pin message.')
+            else:
+                await self.bot.say('**Done!** Successfully pinned message.')
+
+    @pinmsgdate.error
+    async def pinmsgdate_error(self, error, ctx):
+        if type(error) is commands.BadArgument:
+            await self.bot.say(error)
 
     @commands.group(pass_context=True, no_pm=True, aliases=['purge'])
     @checks.admin_or_permissions(manage_messages=True)
