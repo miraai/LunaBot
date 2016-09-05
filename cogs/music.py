@@ -354,10 +354,6 @@ class Audio:
 
         return voice_client  #Docs said so
 
-    # TODO: _current_playlist
-
-    # TODO: _current_song
-
     def _delete_playlist(self, server, name):
         if not name.endswith('.txt'):
             name = name + ".txt"
@@ -367,8 +363,6 @@ class Audio:
             pass
         except WindowsError:
             pass
-
-    # TODO: _disable_controls()
 
     async def _disconnect_voice_client(self, server):
         if not self.voice_connected(server):
@@ -450,8 +444,6 @@ class Audio:
         log.debug("dumped {} MB of audio files".format(dumped))
 
         return dumped
-
-    # TODO: _enable_controls()
 
     # returns list of active voice channels
     # assuming list does not change during the execution of this function
@@ -657,8 +649,6 @@ class Audio:
         if yt_link.match(url):
             return True
         return False
-
-    # TODO: _next_songs_in_queue
 
     async def _parse_playlist(self, url):
         if self._match_sc_playlist(url):
@@ -916,7 +906,7 @@ class Audio:
     def _valid_playable_url(self, url):
         yt = self._match_yt_url(url)
         sc = self._match_sc_url(url)
-        if yt or sc:  # TODO: Add sc check
+        if yt or sc: #nekad, verovatno nikad
             return True
         return False
 
@@ -1069,13 +1059,13 @@ class Audio:
                 await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel
             if self.voice_client(server).channel != voice_channel:
-                pass  # TODO: Perms
+                pass  # isto verovatno nikad
 
         # Checking if playing in current server
 
         if self.is_playing(server):
             await self.bot.say("I'm already playing a song on this server!")
-            return  # TODO: Possibly execute queue?
+            return  # mozda da pozove !queue
 
         # If not playing, spawn a downloader if it doesn't exist and begin
         #   downloading the next song
@@ -1520,7 +1510,7 @@ class Audio:
             await self.bot.say("Not voice connected in this server.")
             return
 
-        # We are connected somewhere
+        # We are connected somewhere, here be dragons
         voice_client = self.voice_client(server)
 
         if not hasattr(voice_client, 'audio_player'):
@@ -1596,7 +1586,7 @@ class Audio:
         """Stops a currently playing song or playlist. CLEARS QUEUE."""
         server = ctx.message.server
         if self.is_playing(server):
-                await self.bot.say('I am stoping the cong and clearing the queue.')
+                await self.bot.say('I am stopping the song and clearing the queue.')
                 self._stop(server)
         else:
             await self.bot.say("Can't stop if I'm not playing.")
