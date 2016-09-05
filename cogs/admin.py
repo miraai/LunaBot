@@ -84,20 +84,21 @@ class Admin:
 
     # so i desperately tried to change the game, and it kinda works, but it doesnt really, and im confused okay
     @commands.command(pass_context=True)
+    @checks.is_owner()
     async def game(self, ctx, *game):
         if ctx.message.channel.permissions_for(ctx.message.author).administrator:
             gameName = ' '.join(game)
             await self.bot.change_status(game=discord.Game(name=gameName))
             await self.bot.say('**Ok.** I changed the game to **{0}**'.format(gameName))
         else:
-            await self.bot.say('**No.**! Admin only command')
+            await self.bot.say('**No!** Owner only command')
 
 
     #this should change bot's avatar, like, who knows what it does really
     @commands.command(pass_context=True)
     @checks.is_owner()
     async def avatar(self, ctx, url: str):
-        '''Sets new avatar for Luna'''
+        """Sets new avatar for Luna"""
         #async with aiohttp.get(''.join(url)) as img:
         #   with open('tempAva.png', 'wb') as f:
         #       f.write(await img.read())
@@ -112,7 +113,7 @@ class Admin:
     @commands.command(pass_context=True)
     @checks.is_owner()
     async def name(self, ctx, *name):
-        '''Changes Bot Name'''
+        """Changes Bot Name"""
         if ctx.message.channel.permissions_for(ctx.message.author).administrator:
             name = ' '.join(name)
             await self.bot.edit_profile(username=name)

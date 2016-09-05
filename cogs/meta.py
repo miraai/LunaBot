@@ -267,10 +267,10 @@ class Meta:
 
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
-    @commands.command()
+    @commands.command(pass_contect=True, pm_help=True)
     async def join(self):
         """Joins a server."""
-        msg = 'If you want me to go crazy in your server, use this URL: \n\n'
+        msg = 'If you want to add Luna to your server, use this URL: \n\n'
         perms = discord.Permissions.none()
         perms.read_messages = True
         perms.send_messages = True

@@ -96,4 +96,5 @@ ENV/
 ~*
 *.json
 .idea/**
+.data/**
 credentials.json

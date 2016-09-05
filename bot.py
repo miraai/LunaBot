@@ -30,6 +30,7 @@ initial_extensions = [
     'cogs.admin',
     'cogs.buttons',
     'cogs.customreactions',
+    'cogs.music'
 ]
 #so these should be kinda modules/plugins
 
@@ -46,8 +47,9 @@ log.addHandler(handler)
 help_attrs = dict(hidden=True)
 
 #prefix, can be either ? or !
-prefix = ['?', '!', '\N{HEAVY EXCLAMATION MARK SYMBOL}']
+prefix = ['?', '!']
 bot = commands.Bot(command_prefix=prefix, description=description, pm_help=None, help_attrs=help_attrs)
+
 
 #still not clear with what these events are for, i assume its something like even handlers or whatever
 #so basically, if the command which can not be used in DM is used there, bot sends the message that it cant be used
