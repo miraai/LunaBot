@@ -267,10 +267,11 @@ class Meta:
 
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
-    @commands.command(pass_contect=True, pm_help=True)
-    async def join(self):
-        """Joins a server."""
-        msg = 'If you want to add Luna to your server, use this URL: \n\n'
+    @commands.command(pass_context=True, no_pm=False)
+    async def join(self, ctx):
+        """Add Luna to your server."""
+
+        msg = 'If you want to add Luna to your server, use this URL: \n'
         perms = discord.Permissions.none()
         perms.read_messages = True
         perms.send_messages = True
@@ -281,7 +282,8 @@ class Meta:
         perms.embed_links = True
         perms.read_message_history = True
         perms.attach_files = True
-        await self.bot.say(msg + discord.utils.oauth_url(self.bot.client_id, perms))
+        url = discord.utils.oauth_url(self.bot.client_id, perms)
+        await self.bot.send_message(ctx.message.author, msg+url)
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
