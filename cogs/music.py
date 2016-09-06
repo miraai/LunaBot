@@ -1131,6 +1131,7 @@ class Audio:
         else:
             if self.is_playing(server):
                 await ctx.invoke(self._queue, url=url)
+                await self.bot.say("**Done.** I am searching a song.")
                 return  # Default to queue
 
         # Checking already connected, will join if not
