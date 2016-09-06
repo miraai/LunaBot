@@ -361,8 +361,6 @@ class Audio:
             os.remove(os.path.join('data/audio/playlists', server.id, name))
         except OSError:
             pass
-        except WindowsError:
-            pass
 
     async def _disconnect_voice_client(self, server):
         if not self.voice_connected(server):
@@ -429,9 +427,6 @@ class Audio:
                         os.remove(os.path.join(self.cache_path, file))
                     except OSError:
                         # A directory got in the cache?
-                        pass
-                    except WindowsError:
-                        # Removing a file in use, reqd failed
                         pass
 
         post_size = self._cache_size()
@@ -937,7 +932,7 @@ class Audio:
         self.save_settings()
 
     @commands.command(pass_context=True, name="volume", no_pm=True)
-    @checks.mod_or_permissions(manage_messages=True)
+    #@checks.mod_or_permissions(manage_messages=True)
     async def setvolume(self, ctx, percent: int=None):
         """Sets the volume (0 - 100)
         Note: volume may be set up to 200 but you may experience clipping."""
