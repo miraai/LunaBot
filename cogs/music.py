@@ -225,7 +225,7 @@ class Downloader(threading.Thread):
         self.song = Song(**video)
 
 
-class Audio:
+class Music:
     """Music Streaming.
     DISCLAIMER: I have no idea how this works!"""
 
@@ -1861,7 +1861,7 @@ def setup(bot):
         raise RuntimeError(
             "Your discord.py is outdated. Update to the newest one with\npip3 "
             "install --upgrade git+https://github.com/Rapptz/discord.py@async")
-    n = Audio(bot)  # Praise 26
+    n = Music(bot)  # Praise 26
     bot.add_cog(n)
     bot.add_listener(n.voice_state_update, 'on_voice_state_update')
     bot.loop.create_task(n.queue_scheduler())
