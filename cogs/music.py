@@ -1440,7 +1440,7 @@ class Music:
                 song_info.append("{}. {.title}".format(num, song))
             except AttributeError:
                 song_info.append("{}. {.webpage_url}".format(num, song))
-        msg += "\n**Next up:**\n" + "\n\n".join(song_info)
+        msg += "\n**Next up:**\n" + "\n".join(song_info)
 
         await self.bot.say(msg)
 
