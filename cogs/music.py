@@ -245,11 +245,6 @@ class Music:
             self._setup_queue(server)
         self.queue[server.id]["QUEUE"].append(url)
 
-    def _add_to_temp_queue(self, server, url):
-        if server.id not in self.queue:
-            self._setup_queue(server)
-        self.queue[server.id]["TEMP_QUEUE"].append(url)
-
     def _addleft_to_queue(self, server, url):
         if server.id not in self.queue:
             self._setup_queue()
@@ -300,7 +295,6 @@ class Music:
         if server.id not in self.queue:
             return
         self.queue[server.id]["QUEUE"] = deque()
-        self.queue[server.id]["TEMP_QUEUE"] = deque()
 
     async def _create_ffmpeg_player(self, server, filename, local=False):
         """This function will guarantee we have a valid voice client,
@@ -481,18 +475,6 @@ class Music:
             return None
 
         return self.queue[server.id]["REPEAT"]
-
-    def _get_queue_tempqueue(self, server, limit):
-        if server.id not in self.queue:
-            return []
-
-        ret = []
-        for i in range(limit):
-            try:
-                ret.append(self.queue[server.id]["TEMP_QUEUE"][i])
-            except IndexError:
-                pass
-        return ret
 
     async def _guarantee_downloaded(self, server, url):
         max_length = self.settings["MAX_LENGTH"]
@@ -819,9 +801,6 @@ class Music:
     def _shuffle_queue(self, server):
         shuffle(self.queue[server.id]["QUEUE"])
 
-    def _shuffle_temp_queue(self, server):
-        shuffle(self.queue[server.id]["TEMP_QUEUE"])
-
     def _server_count(self):
         return max([1, len(self.bot.servers)])
 
@@ -864,7 +843,7 @@ class Music:
     def _setup_queue(self, server):
         self.queue[server.id] = {"REPEAT": False, "PLAYLIST": False,
                                  "VOICE_CHANNEL_ID": None,
-                                 "QUEUE": deque(), "TEMP_QUEUE": deque(),
+                                 "QUEUE": deque(),
                                  "NOW_PLAYING": None}
 
     def _stop(self, server):
@@ -1424,14 +1403,9 @@ class Music:
             url = url.split("&")[0] # Temp fix for the &list issue
 
         # We have a queue to modify
-        if self.queue[server.id]["PLAYLIST"]:
-            log.debug("queueing to the temp_queue for sid {}".format(
-                server.id))
-            self._add_to_temp_queue(server, url)
-        else:
-            log.debug("queueing to the actual queue for sid {}".format(
-                server.id))
-            self._add_to_queue(server, url)
+        log.debug("queueing to the actual queue for sid {}".format(
+            server.id))
+        self._add_to_queue(server, url)
         await self.bot.say("**Done.** Song added to the queue.")
 
     async def _queue_list(self, ctx):
@@ -1451,21 +1425,14 @@ class Music:
         if now_playing is not None:
             msg += "\n**Now playing:**\n{}".format(now_playing.title)
 
-        queue_url_list = self._get_queue(server, 5)
-        tempqueue_url_list = self._get_queue_tempqueue(server, 5)
+        queue_url_list = self._get_queue(server, 10)
 
         await self.bot.say("**Please wait**. Collecting information...")
 
         queue_song_list = await self._download_all(queue_url_list)
-        tempqueue_song_list = await self._download_all(tempqueue_url_list)
+
 
         song_info = []
-        for num, song in enumerate(tempqueue_song_list, 1):
-            try:
-                song_info.append("{}. {.title}".format(num, song))
-            except AttributeError:
-                song_info.append("{}. {.webpage_url}".format(num, song))
-
         for num, song in enumerate(queue_song_list, len(song_info) + 1):
             if num > 5:
                 break
@@ -1537,7 +1504,6 @@ class Music:
             return
 
         self._shuffle_queue(server)
-        self._shuffle_temp_queue(server)
 
         await self.bot.say("**Done.** Queue shuffled.")
 
@@ -1698,12 +1664,10 @@ class Music:
         max_length = self.settings["MAX_LENGTH"]
 
         # This is a reference, or should be at least
-        temp_queue = self.queue[server.id]["TEMP_QUEUE"]
         queue = self.queue[server.id]["QUEUE"]
         repeat = self.queue[server.id]["REPEAT"]
         last_song = self.queue[server.id]["NOW_PLAYING"]
 
-        assert temp_queue is self.queue[server.id]["TEMP_QUEUE"]
         assert queue is self.queue[server.id]["QUEUE"]
 
         # _play handles creating the voice_client and player for us
@@ -1711,14 +1675,7 @@ class Music:
         if not self.is_playing(server):
             log.debug("not playing anything on sid {}".format(server.id) +
                       ", attempting to start a new song.")
-            if len(temp_queue) > 0:
-                # Fake queue for irdumb's temp playlist songs
-                log.debug("calling _play because temp_queue is non-empty")
-                try:
-                    song = await self._play(sid, temp_queue.popleft())
-                except MaximumLength:
-                    return
-            elif len(queue) > 0:  # We're in the normal queue
+            if len(queue) > 0:  # We're in the normal queue
                 url = queue.popleft()
                 log.debug("calling _play on the normal queue")
                 try:
@@ -1735,10 +1692,7 @@ class Music:
         elif server.id in self.downloaders:
             # We're playing but we might be able to download a new song
             curr_dl = self.downloaders.get(server.id)
-            if len(temp_queue) > 0:
-                next_dl = Downloader(temp_queue.peekleft(),
-                                     max_length)
-            elif len(queue) > 0:
+            if len(queue) > 0:
                 next_dl = Downloader(queue.peekleft(), max_length)
             else:
                 next_dl = None
@@ -1753,8 +1707,7 @@ class Music:
             tasks = []
             queue = copy.deepcopy(self.queue)
             for sid in queue:
-                if len(queue[sid]["QUEUE"]) == 0 and \
-                        len(queue[sid]["TEMP_QUEUE"]) == 0:
+                if len(queue[sid]["QUEUE"]) == 0:
                     continue
                 # log.debug("scheduler found a non-empty queue"
                 #           " for sid: {}".format(sid))
