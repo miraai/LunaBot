@@ -46,8 +46,14 @@ log.addHandler(handler)
 
 help_attrs = dict(hidden=True)
 
+#loads bot credentials.json as file. Takes client_id, carbon_key and bots_key=client_id now (i will fix it)
+#if id is missing, it wont load the file
+def load_credentials():
+    with open('credentials.json') as f:
+        return json.load(f)
+
 #prefix, can be either ? or !
-prefix = ['?', '!']
+prefix = load_credentials()["prefix"]
 bot = commands.Bot(command_prefix=prefix, description=description, pm_help=None, help_attrs=help_attrs)
 
 
@@ -119,12 +125,6 @@ async def do(ctx, times : int, *, command):
 async def changelog():
     """Gives a URL to the current bot changelog."""
     await bot.say('https://discord.gg/y2PcWMM')
-
-#loads bot credentials.json as file. Takes client_id, carbon_key and bots_key=client_id now (i will fix it)
-#if id is missing, it wont load the file
-def load_credentials():
-    with open('credentials.json') as f:
-        return json.load(f)
 
 if __name__ == '__main__':
     if any('debug' in arg.lower() for arg in sys.argv):
