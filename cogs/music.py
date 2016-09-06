@@ -1291,11 +1291,13 @@ class Audio:
         else:
             await self.bot.say("**Done.** Song has been added to the playlist {}.".format(name))
 
+    '''
     @playlist.command(pass_context=True, no_pm=True, hidden=True, name="extend")
     async def playlist_extend(self, ctx, playlist_url_or_name):
         """Adds a playlist to the current playlist."""
         # Need better wording ^
         await self.bot.say("Not implemented yet.")
+    '''
 
     @playlist.command(pass_context=True, no_pm=True, name="list")
     async def playlist_list(self, ctx):
@@ -1314,7 +1316,7 @@ class Audio:
     @playlist.command(pass_context=True, no_pm=True, name="queue")
     async def playlist_queue(self, ctx, url):
         """Adds a song to the playlist loop.
-        Does NOT write to disk."""
+        Doesn't save a song to the playlist."""
         server = ctx.message.server
         if not self.voice_connected(server):
             await self.bot.say("Not voice connected in this server.")
@@ -1344,7 +1346,7 @@ class Audio:
         else:
             await self.bot.say("Playlist not found.")
 
-    @playlist.command(pass_context=True, hidden=True, no_pm=True, name="start")
+    @playlist.command(pass_context=True, no_pm=True, name="start")
     async def playlist_start(self, ctx, name):
         """Plays a playlist."""
         server = ctx.message.server
