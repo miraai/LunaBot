@@ -174,7 +174,6 @@ class Meta:
             ('Roles', ', '.join(roles)),
             ('Servers', '{} shared'.format(shared)),
             ('Voice', voice),
-            ('Avatar', member.avatar_url),
         ]
 
         await formats.indented_entry_to_code(self.bot, entries)
