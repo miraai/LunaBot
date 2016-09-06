@@ -1532,16 +1532,18 @@ class Audio:
 
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):
-        """Skips a song. Ne radi <Does not work>"""
+        """Skips a song. Could bug out."""
+        msg = ctx.message
         server = ctx.message.server
         if self.is_playing(server):
+            vchan = server.me.voice_channel
+            vc = self.voice_client(server)
+            vc.audio_player.stop()
             if self._get_queue_repeat(server) is False:
                 self._set_queue_nowplaying(server, None)
-                await self.bot.say("Skipping...")
-            else:
-                await self.bot.reply("you aren't in the current playback channel.")
+            await self.bot.say("Skipping...")
         else:
-            await self.bot.say("Can't skip if I'm not playing.")
+            await self.bot.reply("I can't skip if im not playing anything, silly.")
 
 
     @commands.command(pass_context=True, no_pm=True)
