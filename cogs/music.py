@@ -226,7 +226,7 @@ class Downloader(threading.Thread):
         self.song = Song(**video)
 
 
-class Audio:
+class Music:
     """Music Streaming.
     DISCLAIMER: I have no idea how this works!"""
 
@@ -1182,7 +1182,7 @@ class Audio:
 
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
-        """Goes back to the last song. It doesn't really. It resets the current song and queues the previous one."""
+        """Goes back to the last song. It doesn't really."""
         server = ctx.message.server
 
         if self.is_playing(server):
@@ -1608,7 +1608,7 @@ class Audio:
         return True
 
     async def cache_manager(self):
-        while self == self.bot.get_cog("Audio"):
+        while self == self.bot.get_cog("Music"):
             if self._cache_too_large():
                 # Our cache is too big, dumping
                 log.debug("cache too large ({} > {}), dumping".format(
@@ -1629,7 +1629,7 @@ class Audio:
 
     async def disconnect_timer(self):
         stop_times = {}
-        while self == self.bot.get_cog('Audio'):
+        while self == self.bot.get_cog('Music'):
             for vc in self.bot.voice_clients:
                 server = vc.server
                 if not hasattr(vc, 'audio_player') and \
@@ -1749,7 +1749,7 @@ class Audio:
                 await self._download_next(server, curr_dl, next_dl)
 
     async def queue_scheduler(self):
-        while self == self.bot.get_cog('Audio'):
+        while self == self.bot.get_cog('Music'):
             tasks = []
             queue = copy.deepcopy(self.queue)
             for sid in queue:
@@ -1767,7 +1767,7 @@ class Audio:
             await asyncio.sleep(1)
 
     async def reload_monitor(self):
-        while self == self.bot.get_cog('Audio'):
+        while self == self.bot.get_cog('Music'):
             await asyncio.sleep(0.5)
 
         for vc in self.bot.voice_clients:
@@ -1868,7 +1868,7 @@ def setup(bot):
         raise RuntimeError(
             "Your discord.py is outdated. Update to the newest one with\npip3 "
             "install --upgrade git+https://github.com/Rapptz/discord.py@async")
-    n = Audio(bot)  # Praise 26
+    n = Music(bot)  # Praise 26
     bot.add_cog(n)
     bot.add_listener(n.voice_state_update, 'on_voice_state_update')
     bot.loop.create_task(n.queue_scheduler())
