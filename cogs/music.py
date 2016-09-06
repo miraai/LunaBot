@@ -3,7 +3,7 @@ from discord.ext import commands
 import threading
 import os
 from random import shuffle
-from cogs.utils.dataIO import fileIO
+from cogs.utils.inout import fileIO
 from cogs.utils import checks
 import re
 import logging
@@ -1827,9 +1827,9 @@ def check_folders():
 
 
 def check_files():
-    default = {"VOLUME": 50, "MAX_LENGTH": 3700, "VOTE_ENABLED": True,
+    default = {"VOLUME": 50, "MAX_LENGTH": 3700, "VOTE_ENABLED": False,
                "MAX_CACHE": 0, "SOUNDCLOUD_CLIENT_ID": None,
-               "TITLE_STATUS": True, "AVCONV": False, "VOTE_THRESHOLD": 50,
+               "TITLE_STATUS": False, "AVCONV": False, "VOTE_THRESHOLD": 0,
                "SERVERS": {}}
     settings_path = "data/audio/settings.json"
 
