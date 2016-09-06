@@ -1482,11 +1482,11 @@ class Audio:
         if ctx.invoked_subcommand is None:
             if self.is_playing(server):
                 if self.queue[server.id]["REPEAT"]:
-                    msg = "The queue is currently looping."
+                    msg = "**Done.** The queue is currently looping."
                 else:
-                    msg = "The queue is currently not looping."
+                    msg = "**Done.** The queue is currently not looping."
                 await self.bot.say(msg)
-                await self.bot.say("Do `{}repeat toggle` to change this.".format(ctx.prefix))
+                await self.bot.say("Do `{}repeat toggle` to change the loop state.".format(ctx.prefix))
             else:
                 await self.bot.say("Play something to see this setting.")
 
@@ -1502,9 +1502,9 @@ class Audio:
         self._set_queue_repeat(server, not self.queue[server.id]["REPEAT"])
         repeat = self.queue[server.id]["REPEAT"]
         if repeat:
-            await self.bot.say("Repeat toggled on.")
+            await self.bot.say("**Done.** Repeat toggled on.")
         else:
-            await self.bot.say("Repeat toggled off.")
+            await self.bot.say("**Done.** Repeat toggled off.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
@@ -1522,22 +1522,22 @@ class Audio:
         elif not voice_client.audio_player.is_done() and \
                 not voice_client.audio_player.is_playing():
             voice_client.audio_player.resume()
-            await self.bot.say("Resuming.")
+            await self.bot.say("**Done.**  Resuming the song.")
         else:
-            await self.bot.say("Nothing paused, nothing to resume.")
+            await self.bot.say("**Error**. I can't resume if nothing is paused.")
 
     @commands.command(pass_context=True, no_pm=True, name="shuffle")
     async def _shuffle(self, ctx):
         """Shuffles the current queue. Maybe."""
         server = ctx.message.server
         if server.id not in self.queue:
-            await self.bot.say("I have nothing in queue to shuffle.")
+            await self.bot.say("**Error**. There is nothing in queue to shuffle.")
             return
 
         self._shuffle_queue(server)
         self._shuffle_temp_queue(server)
 
-        await self.bot.say("Queues shuffled.")
+        await self.bot.say("**Done.** Queue shuffled.")
 
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):
@@ -1550,7 +1550,7 @@ class Audio:
             vc.audio_player.stop()
             if self._get_queue_repeat(server) is False:
                 self._set_queue_nowplaying(server, None)
-            await self.bot.say("Skipping...")
+            await self.bot.say("**Done.** I am skipping a song. Poor song.")
         else:
             await self.bot.reply("I can't skip if im not playing anything, silly.")
 
@@ -1576,17 +1576,17 @@ class Audio:
                        dur, song.webpage_url))
             await self.bot.say(msg.replace("**Duration:** None\n", ""))
         else:
-            await self.bot.say("Done goofed.")
+            await self.bot.say("**Error.** Mirai done goofed.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
-        """Stops a currently playing song or playlist. CLEARS QUEUE."""
+        """Stops currently playing song or playlist."""
         server = ctx.message.server
         if self.is_playing(server):
-                await self.bot.say('I am stopping the song and clearing the queue.')
+                await self.bot.say('**Done.** I am stopping the song and clearing the queue.')
                 self._stop(server)
         else:
-            await self.bot.say("Can't stop if I'm not playing.")
+            await self.bot.say("Can't stop if I'm not playing anything, silly.")
 
     @commands.command(name="yt", pass_context=True, no_pm=True)
     async def yt_search(self, ctx, *, search_terms: str):
