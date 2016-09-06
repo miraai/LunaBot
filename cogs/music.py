@@ -1209,7 +1209,7 @@ class Audio:
         else:
             await self.bot.say("Not playing anything on this server.")
 
-    @commands.group(pass_context=True, alias=["pls"], no_pm=True)
+    @commands.group(pass_context=True, aliases=['pls'], no_pm=True, help='This is a testo')
     async def playlist(self, ctx):
         """Playlist commands. Do `!help playlist` for all commands."""
         if ctx.invoked_subcommand is None:
