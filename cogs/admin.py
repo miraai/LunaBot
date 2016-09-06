@@ -33,7 +33,7 @@ class Admin:
     @commands.command(hidden=True)
     @checks.is_owner()
     async def leaveserver(self, id : str):
-        """Luna leaves from passed Server ID"""
+        """Luna leaves from that Server ID"""
         servers = self.bot.servers
         for server in servers:
             if server.id == id:
