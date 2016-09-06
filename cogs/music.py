@@ -1,4 +1,5 @@
 import discord
+import functools
 from discord.ext import commands
 import threading
 import os
@@ -14,23 +15,30 @@ import math
 import time
 import inspect
 import youtube_dl
+from discord import opus
+from concurrent.futures import ThreadPoolExecutor
 
 log = logging.getLogger("luna.music")
+OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll', 'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
 
 try:
     import youtube_dl
 except:
     youtube_dl = None
 
-try:
-    if not discord.opus.is_loaded():
-        discord.opus.load_opus('libopus-0.dll')
-except OSError:  # Incorrect bitness
-    opus = False
-except:  # Missing opus
-    opus = None
-else:
-    opus = True
+
+def load_opus_lib(opus_libs=OPUS_LIBS):
+    if opus.is_loaded():
+        return True
+
+    for opus_lib in opus_libs:
+        try:
+            opus.load_opus(opus_lib)
+            return
+        except OSError:
+            pass
+
+    raise RuntimeError('Could not load an opus lib. Tried %s' % (', '.join(opus_libs)))
 
 youtube_dl_options = {
     'source_address': '0.0.0.0',
@@ -224,7 +232,6 @@ class Downloader(threading.Thread):
                                           process=False)
 
         self.song = Song(**video)
-
 
 class Music:
     """Music Streaming.
@@ -1153,11 +1160,11 @@ class Music:
 
         if "[SEARCH:]" not in url and "youtube" in url:
             url = url.split("&")[0] # Temp fix for the &list issue
-            await self.bot.say("I am playing a song.")
+            await self.bot.say("I am searching a song.")
         self._stop_player(server)
         self._clear_queue(server)
         self._add_to_queue(server, url)
-        await self.bot.say("**Done.** I am searching a song.")
+        await self.bot.say("**Done.** I am playing a song.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
