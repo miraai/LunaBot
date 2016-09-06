@@ -310,12 +310,13 @@ class Meta:
         """Tells you information about the bot itself."""
         revision = os.popen(r'git show -s HEAD --format="%s (%cr)"').read().strip()
         result = ['**About Me:**']
-        result.append('- Author: Mirai [ID: 173502573205127170]')
-        result.append('- Library: discord.py (Python)')
-        result.append('- Latest Change: {}'.format(revision))
-        result.append('- Uptime: {}'.format(self.get_bot_uptime()))
-        result.append('- Servers: {}'.format(len(self.bot.servers)))
-        result.append('- Commands Run: {}'.format(sum(self.bot.commands_used.values())))
+        result.append('```xl\n')
+        result.append('• Author: Mirai [ID: 173502573205127170]')
+        result.append('• Library: discord.py (Python)')
+        result.append('• Latest Change: {}'.format(revision))
+        result.append('• Uptime: {}'.format(self.get_bot_uptime()))
+        result.append('• Servers: {}'.format(len(self.bot.servers)))
+        result.append('• Commands Run: {}'.format(sum(self.bot.commands_used.values())))
 
         # statistics
         total_members = sum(len(s.members) for s in self.bot.servers)
@@ -325,11 +326,12 @@ class Meta:
         channel_types = Counter(c.type for c in self.bot.get_all_channels())
         voice = channel_types[discord.ChannelType.voice]
         text = channel_types[discord.ChannelType.text]
-        result.append('- Total Members: {} ({} online)'.format(total_members, total_online))
-        result.append('- Unique Members: {} ({} online)'.format(len(unique_members), unique_online))
-        result.append('- {} text channels, {} voice channels'.format(text, voice))
+        result.append('• Total Members: {} ({} online)'.format(total_members, total_online))
+        result.append('• Unique Members: {} ({} online)'.format(len(unique_members), unique_online))
+        result.append('• {} text channels, {} voice channels'.format(text, voice))
         result.append('')
-        result.append('Luna server: https://discord.gg/PDmtxWq')
+        result.append('Luna server: https://discord.gg/PDmtxWq\n')
+        result.append('```')
         await self.bot.say('\n'.join(result))
 
     @commands.command(rest_is_raw=True, hidden=True)
