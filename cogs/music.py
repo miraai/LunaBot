@@ -1183,7 +1183,6 @@ class Audio:
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
         """Goes back to the last song. It doesn't really. It resets the current song and queues the previous one."""
-        # Current song is in NOW_PLAYING
         server = ctx.message.server
 
         if self.is_playing(server):
@@ -1210,9 +1209,9 @@ class Audio:
         else:
             await self.bot.say("Not playing anything on this server.")
 
-    @commands.group(pass_context=True, hidden=True, no_pm=True)
+    @commands.group(pass_context=True, alias=["pls"], no_pm=True)
     async def playlist(self, ctx):
-        """Playlist management/control."""
+        """Playlist commands. Do `!help playlist` for all commands."""
         if ctx.invoked_subcommand is None:
             await self.bot.say(ctx)
 
@@ -1235,7 +1234,7 @@ class Audio:
         playlist.server = server
 
         self._save_playlist(server, name, playlist)
-        await self.bot.say("Empty playlist '{}' saved.".format(name))
+        await self.bot.say("**Done.** Empty playlist '{}' saved.".format(name))
 
 
 
@@ -1265,7 +1264,7 @@ class Audio:
             playlist.server = server
 
             self._save_playlist(server, name, playlist)
-            await self.bot.say("Playlist '{}' saved. Tracks: {}".format(
+            await self.bot.say("**Done.** Playlist '{}' saved. Tracks: {}".format(
                 name, len(songlist)))
         else:
             await self.bot.say("That URL is not a valid Soundcloud or YouTube"
@@ -1275,7 +1274,7 @@ class Audio:
 
     @playlist.command(pass_context=True, no_pm=True, name="append")
     async def playlist_append(self, ctx, name, url):
-        """Appends to a playlist."""
+        """Adds a link of the song at the end of the playlist."""
         author = ctx.message.author
         server = ctx.message.server
         if name not in self._list_playlists(server):
@@ -1290,11 +1289,11 @@ class Audio:
         except InvalidURL:
             await self.bot.say("Invalid link.")
         else:
-            await self.bot.say("Done.")
+            await self.bot.say("**Done.** Song has been added to the playlist {}.".format(name))
 
-    @playlist.command(pass_context=True, no_pm=True, name="extend")
+    @playlist.command(pass_context=True, no_pm=True, hidden=True, name="extend")
     async def playlist_extend(self, ctx, playlist_url_or_name):
-        """Extends a playlist with a playlist link"""
+        """Adds a playlist to the current playlist."""
         # Need better wording ^
         await self.bot.say("Not implemented yet.")
 
@@ -1396,7 +1395,7 @@ class Audio:
 
     @commands.command(pass_context=True, no_pm=True, name="queue")
     async def _queue(self, ctx, *, url=None):
-        """Queues a song to play next."""
+        """Queues a song to play next.!queue without arguments shows queue info."""
         if url is None:
             return await self._queue_list(ctx)
         server = ctx.message.server
@@ -1431,7 +1430,7 @@ class Audio:
             log.debug("queueing to the actual queue for sid {}".format(
                 server.id))
             self._add_to_queue(server, url)
-        await self.bot.say("Song added to the queue.")
+        await self.bot.say("**Done.** Song added to the queue.")
 
     async def _queue_list(self, ctx):
         """Not a command, use `queue` with no args to call this."""
@@ -1453,7 +1452,7 @@ class Audio:
         queue_url_list = self._get_queue(server, 5)
         tempqueue_url_list = self._get_queue_tempqueue(server, 5)
 
-        await self.bot.say("Gathering information...")
+        await self.bot.say("**Please wait**. Collecting information...")
 
         queue_song_list = await self._download_all(queue_url_list)
         tempqueue_song_list = await self._download_all(tempqueue_url_list)
@@ -1472,7 +1471,7 @@ class Audio:
                 song_info.append("{}. {.title}".format(num, song))
             except AttributeError:
                 song_info.append("{}. {.webpage_url}".format(num, song))
-        msg += "\n***Next up:***\n" + "\n".join(song_info)
+        msg += "\n**Next up:**" + "\n".join(song_info)
 
         await self.bot.say(msg)
 
