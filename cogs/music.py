@@ -13,6 +13,7 @@ import asyncio
 import math
 import time
 import inspect
+import youtube_dl
 
 log = logging.getLogger("luna.music")
 
@@ -934,8 +935,7 @@ class Audio:
     @commands.command(pass_context=True, name="volume", no_pm=True)
     #@checks.mod_or_permissions(manage_messages=True)
     async def setvolume(self, ctx, percent: int=None):
-        """Sets the volume (0 - 100)
-        Note: volume may be set up to 200 but you may experience clipping."""
+        """Sets the volume (0 - 100)"""
         server = ctx.message.server
         if percent is None:
             vol = self.get_server_settings(server)['VOLUME']
@@ -957,6 +957,7 @@ class Audio:
         await self.bot.say(msg)
 
     @commands.command(pass_context=True, hidden=True)
+    @checks.is_owner()
     async def statservers(self):
         """Number of servers currently playing."""
 
@@ -1019,7 +1020,7 @@ class Audio:
             self._stop(server)
 
         await self._join_voice_channel(voice_channel)
-
+    '''
     @commands.group(pass_context=True, hidden=True, no_pm=True)
     async def local(self, ctx):
         """Local playlists commands"""
@@ -1091,6 +1092,7 @@ class Audio:
         else:
             await self.bot.say("There are no playlists.")
 
+    '''
     @commands.command(pass_context=True, no_pm=True)
     async def pause(self, ctx):
         """Pauses the current song, `!resume` to continue."""
@@ -1120,11 +1122,19 @@ class Audio:
 
         # Checking if playing in current server
 
-        if self.is_playing(server):
-            await ctx.invoke(self._queue, url=url)
-            return  # Default to queue
+        if not self.voice_connected(server):
+            try:
+                self.voice_connected(server)
+            except AuthorNotConnected:
+                await self.bot.say("You are not connected to the voice channel.")
+                return
+        else:
+            if self.is_playing(server):
+                await ctx.invoke(self._queue, url=url)
+                return  # Default to queue
 
         # Checking already connected, will join if not
+
 
         if not self.voice_connected(server):
             try:
@@ -1556,13 +1566,9 @@ class Audio:
 
         song = self._get_queue_nowplaying(server)
         if song:
-            if not hasattr(song, 'creator'):
-                song.creator = None
-            if not hasattr(song, 'uploader'):
-                song.uploader = None
             if hasattr(song, 'duration'):
                 m, s = divmod(song.duration, 60)
-                dur = "{:.0f}:{:.0f}".format(m, s)
+                dur = "{:02d}:{:02d}".format(m,s)
             else:
                 dur = None
             msg = ("\n**Title:** {}\n"
