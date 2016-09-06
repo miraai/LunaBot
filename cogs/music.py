@@ -1131,9 +1131,7 @@ class Audio:
         else:
             if self.is_playing(server):
                 await ctx.invoke(self._queue, url=url)
-                await self.bot.say("**Done.** I am searching a song.")
                 return  # Default to queue
-
         # Checking already connected, will join if not
 
 
@@ -1180,6 +1178,7 @@ class Audio:
         self._stop_player(server)
         self._clear_queue(server)
         self._add_to_queue(server, url)
+        await self.bot.say("**Done.** I am searching a song.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
@@ -1474,7 +1473,7 @@ class Audio:
                 song_info.append("{}. {.title}".format(num, song))
             except AttributeError:
                 song_info.append("{}. {.webpage_url}".format(num, song))
-        msg += "\n**Next up:**" + "\n\n".join(song_info)
+        msg += "\n**Next up:**\n" + "\n\n".join(song_info)
 
         await self.bot.say(msg)
 
