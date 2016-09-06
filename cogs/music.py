@@ -1543,8 +1543,8 @@ class Music:
                 dur = "{:02d}:{:02d}".format(m,s)
             else:
                 dur = None
-            msg = ("\n**Title:** {}\n"
-                   "**Duration:** {}\n<{}>".format(
+            msg = ("```xl\n• Title: {}\n"
+                   "• Duration: {}\n •URL: {}\n```".format(
                        song.title,
                        dur, song.webpage_url))
             await self.bot.say(msg.replace("**Duration:** None\n", ""))
