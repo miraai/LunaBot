@@ -287,11 +287,7 @@ class Meta:
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
     async def leave(self, ctx):
-        """Leaves the server.
-
-        To use this command you must have Manage Server permissions or have
-        the Bot Admin role.
-        """
+        """Leaves the server."""
         server = ctx.message.server
         try:
             await self.bot.leave_server(server)

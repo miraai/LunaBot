@@ -20,6 +20,28 @@ class Admin:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(hidden=True, pass_context=True)
+    @checks.is_owner()
+    async def allservers(self,ctx):
+        """Shows all servers the bot is on."""
+        servers = self.bot.servers
+        toReturn = "I am in " + str(len(servers)) + " servers\n\n"
+        for server in servers:
+            toReturn += server.name + " [" + server.id + "]\n"
+        await self.bot.send_message(ctx.message.author, toReturn)
+
+    @commands.command(hidden=True)
+    @checks.is_owner()
+    async def leaveserver(self, id : str):
+        """Luna leaves from passed Server ID"""
+        servers = self.bot.servers
+        for server in servers:
+            if server.id == id:
+                await self.bot.leave_server(server)
+                await self.bot.say("I have left {}".format(server.name))
+            else:
+                await self.bot.say("done goofed, mirai chan")
+
     @commands.command(hidden=True)
     @checks.is_owner()
     async def load(self, *, module : str):
