@@ -14,9 +14,7 @@ import asyncio
 import math
 import time
 import inspect
-import youtube_dl
 from discord import opus
-from concurrent.futures import ThreadPoolExecutor
 
 log = logging.getLogger("luna.music")
 OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll', 'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
@@ -490,9 +488,9 @@ class Music:
                 server.id))
             self.downloaders[server.id] = Downloader(url, max_length)
 
-        if self.downloaders[server.id].url != url:  # Our downloader is old
-            # I'm praying to Jeezus that we don't accidentally lose a running
-            #   Downloader
+        if self.downloaders[server.id].url != url:  # My downloader is shit
+            # I'm praying to RNGods that we don't accidentally lose a running
+            # downloader
             log.debug("sid {} in downloaders but wrong url".format(server.id))
             self.downloaders[server.id] = Downloader(url, max_length)
 
