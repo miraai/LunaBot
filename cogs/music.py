@@ -1450,7 +1450,7 @@ class Audio:
         now_playing = self._get_queue_nowplaying(server)
 
         if now_playing is not None:
-            msg += "\n**Now playing:**\n{}\n".format(now_playing.title)
+            msg += "\n**Now playing:**\n{}".format(now_playing.title)
 
         queue_url_list = self._get_queue(server, 5)
         tempqueue_url_list = self._get_queue_tempqueue(server, 5)
@@ -1474,7 +1474,7 @@ class Audio:
                 song_info.append("{}. {.title}".format(num, song))
             except AttributeError:
                 song_info.append("{}. {.webpage_url}".format(num, song))
-        msg += "\n**Next up:**" + "\n".join(song_info)
+        msg += "\n**Next up:**" + "\n\n".join(song_info)
 
         await self.bot.say(msg)
 
