@@ -1424,7 +1424,7 @@ class Music:
         """Plays and mixes a playlist."""
         await self.playlist_start.callback(self, ctx, name)
 
-    @commands.command(pass_context=True, no_pm=True, name="queue")
+    @commands.command(pass_context=True, no_pm=True, name="queue", aliases=["q"])
     async def _queue(self, ctx, *, url=None):
         """Queues a song to play next.!queue without arguments shows queue info."""
         if url is None:
