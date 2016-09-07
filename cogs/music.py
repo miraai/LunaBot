@@ -1477,14 +1477,19 @@ class Music:
 
         queue_url_list = self._get_queue(server, 10)
 
-        await self.bot.say("**Please wait**. Collecting information...")
+
+
+
+        queuemsg = await self.bot.say("**Please wait**. Collecting information...")
+        await asyncio.sleep(2)
+        await self.bot.delete_message(queuemsg)
 
         queue_song_list = await self._download_all(queue_url_list)
 
 
         song_info = []
         for num, song in enumerate(queue_song_list, len(song_info) + 1):
-            if num > 5:
+            if num > 10:
                 break
             try:
                 song_info.append("{}. {.title}".format(num, song))
@@ -1492,7 +1497,7 @@ class Music:
                 song_info.append("{}. {.webpage_url}".format(num, song))
         msg += "\n• Next up:\n" + "\n".join(song_info)
 
-        await self.bot.say('```xl\n' + msg + '\n```')
+        await self.bot.say('```\n' + msg + '\n```')
 
     @commands.group(pass_context=True, no_pm=True)
     async def repeat(self, ctx):
