@@ -1,20 +1,22 @@
-import discord
-import functools
-from discord.ext import commands
-import threading
-import os
-from random import shuffle
-from cogs.utils.inout import fileIO
-from cogs.utils import checks
-import re
-import logging
+import asyncio
 import collections
 import copy
-import asyncio
-import math
-import time
 import inspect
+import logging
+import math
+import os
+import re
+import threading
+import time
+from random import shuffle
+import discord
 from discord import opus
+from discord.ext import commands
+from urllib.request import urlopen
+from html.parser import HTMLParser
+from cogs.utils import checks
+from cogs.utils.inout import fileIO
+
 
 log = logging.getLogger("luna.music")
 OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll', 'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
@@ -53,6 +55,19 @@ youtube_dl_options = {
     'default_search': 'auto'
 }
 
+class TitleParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.match = False
+        self.title = ''
+
+    def handle_starttag(self, tag, attributes):
+        self.match = True if tag == 'title' else False
+
+    def handle_data(self, data):
+        if self.match:
+            self.title = data
+            self.match = False
 
 class MaximumLength(Exception):
     def __init__(self, m):
@@ -1097,6 +1112,30 @@ class Music:
             await self.bot.say("Nothing playing, nothing to pause.")
 
     @commands.command(pass_context=True, no_pm=True)
+    async def song(self, ctx):
+        """Info about the current song."""
+        server = ctx.message.server
+        if not self.is_playing(server):
+            await self.bot.say("I'm not playing on this server.")
+            return
+
+        song = self._get_queue_nowplaying(server)
+        if song:
+            if hasattr(song, 'duration'):
+                m, s = divmod(song.duration, 60)
+                dur = "{:02d}:{:02d}".format(m, s)
+            else:
+                dur = None
+            msg = ("```xl\n• Title: {}\n"
+                   "• Duration: {}\n• URL: {}\n```".format(
+                song.title,
+                dur, song.webpage_url))
+            await self.bot.say(msg.replace("**Duration:** None\n", ""))
+        else:
+            await self.bot.say("**Error.** Mirai done goofed.")
+
+
+    @commands.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, url_or_search_terms):
         """Plays a link / searches and play"""
         url = url_or_search_terms
@@ -1158,11 +1197,17 @@ class Music:
 
         if "[SEARCH:]" not in url and "youtube" in url:
             url = url.split("&")[0] # Temp fix for the &list issue
-            await self.bot.say("I am searching a song.")
         self._stop_player(server)
         self._clear_queue(server)
         self._add_to_queue(server, url)
-        await self.bot.say("**Done.** I am playing a song.")
+        html_string = str(urlopen(url).read())
+
+        parser = TitleParser()
+        parser.feed(html_string)
+
+        await self.bot.say("**Done.** Now playing: **{}**.".format(parser.title.replace(" - YouTube", "")))
+
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
@@ -1528,28 +1573,6 @@ class Music:
             await self.bot.reply("I can't skip if im not playing anything, silly.")
 
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def song(self, ctx):
-        """Info about the current song."""
-        server = ctx.message.server
-        if not self.is_playing(server):
-            await self.bot.say("I'm not playing on this server.")
-            return
-
-        song = self._get_queue_nowplaying(server)
-        if song:
-            if hasattr(song, 'duration'):
-                m, s = divmod(song.duration, 60)
-                dur = "{:02d}:{:02d}".format(m,s)
-            else:
-                dur = None
-            msg = ("```xl\n• Title: {}\n"
-                   "• Duration: {}\n• URL: {}\n```".format(
-                       song.title,
-                       dur, song.webpage_url))
-            await self.bot.say(msg.replace("**Duration:** None\n", ""))
-        else:
-            await self.bot.say("**Error.** Mirai done goofed.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
