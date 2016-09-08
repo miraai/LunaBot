@@ -465,14 +465,14 @@ class Music:
                 avcs.append(vc)
         return avcs
 
-    def _get_queue(self, server, limit):
+    def _get_queue(self, server, limit, start = 0):
         if server.id not in self.queue:
             return []
 
         ret = []
         for i in range(limit):
             try:
-                ret.append(self.queue[server.id]["QUEUE"][i])
+                ret.append(self.queue[server.id]["QUEUE"][i + start])
             except IndexError:
                 pass
 
@@ -1424,6 +1424,10 @@ class Music:
         """Plays and mixes a playlist."""
         await self.playlist_start.callback(self, ctx, name)
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def listqueue(self,ctx, page = 1):
+        return await self._queue_list(ctx, page)
+
     @commands.command(pass_context=True, no_pm=True, name="queue", aliases=["q"])
     async def _queue(self, ctx, *, url=None):
         """Queues a song to play next.!queue without arguments shows queue info."""
@@ -1458,8 +1462,9 @@ class Music:
         self._add_to_queue(server, url)
         await self.bot.say("**Done.** Song added to the queue.")
 
-    async def _queue_list(self, ctx):
+    async def _queue_list(self, ctx, page = 1):
         """Not a command, use `queue` with no args to call this."""
+        page = page - 1
         server = ctx.message.server
         if server.id not in self.queue:
             await self.bot.say("Nothing playing on this server!")
@@ -1469,14 +1474,13 @@ class Music:
             return
 
         msg = ""
+        if page == 0:
+            now_playing = self._get_queue_nowplaying(server)
 
-        now_playing = self._get_queue_nowplaying(server)
+            if now_playing is not None:
+                msg += "\n• Now playing:\n{}".format(now_playing.title)
 
-        if now_playing is not None:
-            msg += "\n• Now playing:\n{}".format(now_playing.title)
-
-        queue_url_list = self._get_queue(server, 10)
-
+        queue_url_list = self._get_queue(server, 10, page * 10)
 
 
 
@@ -1498,6 +1502,21 @@ class Music:
         msg += "\n• Next up:\n" + "\n".join(song_info)
 
         await self.bot.say('```\n' + msg + '\n```')
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def delsong(self, ctx, song :int):
+        server = ctx.message.server
+        song = song - 1
+        if song < 0 or len(self.queue[server.id]["QUEUE"]) <= song:
+            self.bot.say("I can't remove a song on that position")
+            return
+        s = self.queue[server.id]["QUEUE"][song]
+        self.queue[server.id]["QUEUE"].remove(s)
+        html_string = str(urlopen(s).read())
+
+        parser = TitleParser()
+        parser.feed(html_string)
+        await self.bot.say("Song **" + str(parser.title.replace(" - YouTube", "")) +"** removed from position **" + str(song + 1) + "**.")
 
     @commands.group(pass_context=True, no_pm=True)
     async def repeat(self, ctx):
