@@ -1426,6 +1426,7 @@ class Music:
 
     @commands.command(pass_context=True, no_pm=True)
     async def listqueue(self,ctx, page = 1):
+        """Lists queue in pages if queue > 10 songs"""
         return await self._queue_list(ctx, page)
 
     @commands.command(pass_context=True, no_pm=True, name="queue", aliases=["q"])
@@ -1505,10 +1506,11 @@ class Music:
 
     @commands.command(pass_context=True, no_pm=True)
     async def delsong(self, ctx, song :int):
+        """Deletes a song from a given position."""
         server = ctx.message.server
         song = song - 1
         if song < 0 or len(self.queue[server.id]["QUEUE"]) <= song:
-            self.bot.say("I can't remove a song on that position")
+            self.bot.say("**Error.** I can't remove a song on that position.")
             return
         s = self.queue[server.id]["QUEUE"][song]
         self.queue[server.id]["QUEUE"].remove(s)
