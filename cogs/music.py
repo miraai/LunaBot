@@ -1424,7 +1424,7 @@ class Music:
         """Plays and mixes a playlist."""
         await self.playlist_start.callback(self, ctx, name)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=["lq"])
     async def listqueue(self,ctx, page = 1):
         """Lists queue in pages if queue > 10 songs"""
         return await self._queue_list(ctx, page)
@@ -1518,7 +1518,7 @@ class Music:
 
         parser = TitleParser()
         parser.feed(html_string)
-        await self.bot.say("Song **" + str(parser.title.replace(" - YouTube", "")) +"** removed from position **" + str(song + 1) + "**.")
+        await self.bot.say("Song **" + str(parser.title.replace(" - YouTube", "")) +"** removed from position " + str(song + 1))
 
     @commands.group(pass_context=True, no_pm=True)
     async def repeat(self, ctx):
