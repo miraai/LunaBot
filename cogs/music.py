@@ -1200,8 +1200,8 @@ class Music:
         self._stop_player(server)
         self._clear_queue(server)
         self._add_to_queue(server, url)
-        html_string = str(urlopen(url).read())
 
+        html_string = str(urlopen(url).read())
         parser = TitleParser()
         parser.feed(html_string)
 
@@ -1497,9 +1497,9 @@ class Music:
             if num > 10:
                 break
             try:
-                song_info.append("{}. {.title}".format(num, song))
+                song_info.append("{}. {.title}".format(num + page * 10, song))
             except AttributeError:
-                song_info.append("{}. {.webpage_url}".format(num, song))
+                song_info.append("{}. {.webpage_url}".format(num + page * 10, song))
         msg += "\n• Next up:\n" + "\n".join(song_info)
 
         await self.bot.say('```\n' + msg + '\n```')
