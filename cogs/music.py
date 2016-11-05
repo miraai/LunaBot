@@ -255,8 +255,7 @@ class Music:
         self.queue = {}  # add deque's, repeat
         self.downloaders = {}  # sid: object
         self.settings = fileIO("data/audio/settings.json", 'load')
-        self.server_specific_setting_keys = ["VOLUME", "VOTE_ENABLED",
-                                             "VOTE_THRESHOLD"]
+        self.server_specific_setting_keys = ["VOLUME"]
         self.cache_path = "data/audio/cache"
         self.local_playlist_path = "data/audio/localtracks"
 
@@ -603,14 +602,18 @@ class Music:
 
         return Playlist(**kwargs)
 
+    '''
     def _local_playlist_songlist(self, name):
         dirpath = os.path.join(self.local_playlist_path, name)
         return os.listdir(dirpath)
+
 
     def _make_local_song(self, filename):
         # filename should be playlist_folder/file_name
         folder, song = os.path.split(filename)
         return Song(name=song, id=filename, title=song, url=filename)
+
+    '''
 
     def _make_playlist(self, author, url, songlist):
         try:
@@ -713,16 +716,19 @@ class Music:
                             " Use {}audioset maxlength to change this.\n\n"
                             "{}".format(self.bot.command_prefix[0], url))
                 raise
-            local = False
+            #local = False
         else:  # Assume local
+            '''
             try:
                 song = self._make_local_song(url)
                 local = True
             except FileNotFoundError:
                 raise
+            '''
+            await self.bot.say("Something went wrong, Mii-chan.")
 
         voice_client = await self._create_ffmpeg_player(server, song.id,
-                                                        local=local)
+                                                        local=False)
         # That ^ creates the audio_player property
 
         voice_client.audio_player.start()
@@ -751,6 +757,7 @@ class Music:
         self._set_queue_repeat(server, True)
         self._set_queue(server, songlist)
 
+    '''
     def _play_local_playlist(self, server, name):
         songlist = self._local_playlist_songlist(name)
 
@@ -760,6 +767,7 @@ class Music:
 
         ret_playlist = Playlist(server=server, name=name, playlist=ret)
         self._play_playlist(server, ret_playlist)
+    '''
 
     def _player_count(self):
         count = 0
@@ -926,9 +934,9 @@ class Music:
         """Toggles between Ffmpeg and Avconv"""
         self.settings["AVCONV"] = not self.settings["AVCONV"]
         if self.settings["AVCONV"]:
-            await self.bot.say("Player toggled. You're now using avconv.")
+            await self.bot.say("Player toggled. You're now using avconv.", delete_after=5)
         else:
-            await self.bot.say("Player toggled. You're now using ffmpeg.")
+            await self.bot.say("Player toggled. You're now using ffmpeg.", delete_after=5)
         self.save_settings()
 
     @commands.command(pass_context=True, name="volume", no_pm=True)
@@ -953,7 +961,7 @@ class Music:
             self.save_settings()
         else:
             msg = "Volume must be between 0 and 100."
-        await self.bot.say(msg)
+        await self.bot.say(msg, delete_after=5)
 
     @commands.command(pass_context=True, hidden=True)
     @checks.is_owner()
@@ -963,7 +971,7 @@ class Music:
         count = self._player_count()
 
         await self.bot.say("Currently playing music in {} servers.".format(
-            count))
+            count), delete_after=5)
 
     @commands.group(pass_context=True, hidden=True)
     async def cache(self, ctx):
@@ -1207,7 +1215,25 @@ class Music:
 
         await self.bot.say("**Done.** Now playing: **{}**.".format(parser.title.replace(" - YouTube", "")))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def movesong(self, ctx, start : int, end: int):
+        """Moves a song from a position to a position"""
+        # start >0 and < len
+        # end > 0 and < len
+        server = ctx.message.server
+        queue = self.queue[server.id]["QUEUE"]
+        if start <= 0 or start > len(queue) or end <= 0 or end > len(queue) + 1:
+            await self.bot.say("You failed to supply correct starting and ending position")
+            return
+        start = start - 1
+        end = end - 1 if start > end else end - 2
 
+        s = queue[start]
+        queue.remove(s)
+
+        queue.insert(end, s)
+
+        await self.bot.say("Moved song {} from {} to {} position".format(s, start+1, end+1))
 
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
@@ -1376,6 +1402,7 @@ class Music:
             await self.bot.say("Playlist not found.")
 
     @playlist.command(pass_context=True, no_pm=True, name="start")
+    @checks.is_in_voice()
     async def playlist_start(self, ctx, name):
         """Plays a playlist."""
         server = ctx.message.server
@@ -1461,7 +1488,7 @@ class Music:
         log.debug("queueing to the actual queue for sid {}".format(
             server.id))
         self._add_to_queue(server, url)
-        await self.bot.say("**Done.** Song added to the queue.")
+        await self.bot.say("**Done.** Song added to the queue.", delete_after=5)
 
     async def _queue_list(self, ctx, page = 1):
         """Not a command, use `queue` with no args to call this."""
@@ -1505,6 +1532,7 @@ class Music:
         await self.bot.say('```\n' + msg + '\n```')
 
     @commands.command(pass_context=True, no_pm=True)
+    @checks.is_in_voice()
     async def delsong(self, ctx, song :int):
         """Deletes a song from a given position."""
         server = ctx.message.server
@@ -1836,10 +1864,8 @@ def check_folders():
 
 
 def check_files():
-    default = {"VOLUME": 50, "MAX_LENGTH": 3700, "VOTE_ENABLED": False,
-               "MAX_CACHE": 0, "SOUNDCLOUD_CLIENT_ID": None,
-               "TITLE_STATUS": False, "AVCONV": False, "VOTE_THRESHOLD": 0,
-               "SERVERS": {}}
+    default = {"VOLUME": 50, "SOUNDCLOUD_CLIENT_ID": None,
+                "AVCONV": False, "SERVERS": {}}
     settings_path = "data/audio/settings.json"
 
     if not os.path.isfile(settings_path):
