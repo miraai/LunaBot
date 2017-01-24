@@ -11,7 +11,7 @@ import datetime
 from collections import Counter
 
 class Admin:
-    """Admin-only commands that make the bot dynamic."""
+    """Admin-only commands that make the bot dynamic-y."""
 
     def __init__(self, bot):
         self.bot = bot
