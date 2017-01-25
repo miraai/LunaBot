@@ -51,6 +51,11 @@ class Buttons:
     async def morning(self):
         """Good night message."""
         await self.bot.say('Good morning! :sunny:')
+        
+    @commands.command()
+    async def sad(self):
+        """Sad panda"""
+        await self.bot.say('Sad :panda:')
 
 def setup(bot):
     bot.add_cog(Buttons(bot))
