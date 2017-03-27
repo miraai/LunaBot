@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord.utils
+import asyncio
 
 #my owner id
 def is_owner_check(message):
@@ -64,3 +65,13 @@ def is_in_servers(*server_ids):
 
 def is_lounge_cpp():
     return is_in_servers('221026478966571009')
+
+def is_in_voice(silent = False):
+    def predicate(ctx):
+        server = ctx.message.server
+        user = ctx.message.author
+        bot = server.me
+        print("does this even work")
+        toReturn = (bot.voice_channel != None) and bot.voice_channel == user.voice_channel
+        return toReturn
+    return commands.check(predicate)
