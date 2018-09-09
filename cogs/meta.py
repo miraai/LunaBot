@@ -174,7 +174,6 @@ class Meta:
             ('Roles', ', '.join(roles)),
             ('Servers', '{} shared'.format(shared)),
             ('Voice', voice),
-            ('Avatar', member.avatar_url),
         ]
 
         await formats.indented_entry_to_code(self.bot, entries)
@@ -267,10 +266,11 @@ class Meta:
 
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
-    @commands.command()
-    async def join(self):
-        """Joins a server."""
-        msg = 'If you want me to go crazy in your server, use this URL: \n\n'
+    @commands.command(pass_context=True, no_pm=False)
+    async def join(self, ctx):
+        """Add Luna to your server."""
+
+        msg = 'If you want to add Luna to your server, use this URL: \n'
         perms = discord.Permissions.none()
         perms.read_messages = True
         perms.send_messages = True
@@ -281,16 +281,13 @@ class Meta:
         perms.embed_links = True
         perms.read_message_history = True
         perms.attach_files = True
-        await self.bot.say(msg + discord.utils.oauth_url(self.bot.client_id, perms))
+        url = discord.utils.oauth_url(self.bot.client_id, perms)
+        await self.bot.send_message(ctx.message.author, msg+url)
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
     async def leave(self, ctx):
-        """Leaves the server.
-
-        To use this command you must have Manage Server permissions or have
-        the Bot Admin role.
-        """
+        """Leaves the server."""
         server = ctx.message.server
         try:
             await self.bot.leave_server(server)
@@ -308,12 +305,13 @@ class Meta:
         """Tells you information about the bot itself."""
         revision = os.popen(r'git show -s HEAD --format="%s (%cr)"').read().strip()
         result = ['**About Me:**']
-        result.append('- Author: Mirai [ID: 173502573205127170]')
-        result.append('- Library: discord.py (Python)')
-        result.append('- Latest Change: {}'.format(revision))
-        result.append('- Uptime: {}'.format(self.get_bot_uptime()))
-        result.append('- Servers: {}'.format(len(self.bot.servers)))
-        result.append('- Commands Run: {}'.format(sum(self.bot.commands_used.values())))
+        result.append('```xl\n')
+        result.append('• Author: Mirai [ID: 173502573205127170]')
+        result.append('• Library: discord.py (Python)')
+        result.append('• Latest Change: {}'.format(revision))
+        result.append('• Uptime: {}'.format(self.get_bot_uptime()))
+        result.append('• Servers: {}'.format(len(self.bot.servers)))
+        result.append('• Commands Run: {}'.format(sum(self.bot.commands_used.values())))
 
         # statistics
         total_members = sum(len(s.members) for s in self.bot.servers)
@@ -323,11 +321,12 @@ class Meta:
         channel_types = Counter(c.type for c in self.bot.get_all_channels())
         voice = channel_types[discord.ChannelType.voice]
         text = channel_types[discord.ChannelType.text]
-        result.append('- Total Members: {} ({} online)'.format(total_members, total_online))
-        result.append('- Unique Members: {} ({} online)'.format(len(unique_members), unique_online))
-        result.append('- {} text channels, {} voice channels'.format(text, voice))
+        result.append('• Total Members: {} ({} online)'.format(total_members, total_online))
+        result.append('• Unique Members: {} ({} online)'.format(len(unique_members), unique_online))
+        result.append('• {} text channels, {} voice channels'.format(text, voice))
         result.append('')
-        result.append('Luna server: https://discord.gg/PDmtxWq')
+        result.append('Luna server: https://discord.gg/PDmtxWq\n')
+        result.append('```')
         await self.bot.say('\n'.join(result))
 
     @commands.command(rest_is_raw=True, hidden=True)

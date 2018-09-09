@@ -10,11 +10,37 @@ import asyncio
 import datetime
 from collections import Counter
 
+"""
+Kwoth has a magical girl.
+"""
+
 class Admin:
     """Admin-only commands that make the bot dynamic-y."""
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(hidden=True, pass_context=True)
+    @checks.is_owner()
+    async def allservers(self,ctx):
+        """Shows all servers the bot is on."""
+        servers = self.bot.servers
+        toReturn = "I am in " + str(len(servers)) + " servers\n\n"
+        for server in servers:
+            toReturn += server.name + " [" + server.id + "]\n"
+        await self.bot.send_message(ctx.message.author, toReturn)
+
+    @commands.command(hidden=True)
+    @checks.is_owner()
+    async def leaveserver(self, id : str):
+        """Luna leaves from that Server ID"""
+        servers = self.bot.servers
+        for server in servers:
+            if server.id == id:
+                await self.bot.leave_server(server)
+                await self.bot.say("I have left {}".format(server.name))
+            else:
+                await self.bot.say("done goofed, mirai chan")
 
     @commands.command(hidden=True)
     @checks.is_owner()
@@ -84,20 +110,21 @@ class Admin:
 
     # so i desperately tried to change the game, and it kinda works, but it doesnt really, and im confused okay
     @commands.command(pass_context=True)
+    @checks.is_owner()
     async def game(self, ctx, *game):
         if ctx.message.channel.permissions_for(ctx.message.author).administrator:
             gameName = ' '.join(game)
             await self.bot.change_status(game=discord.Game(name=gameName))
             await self.bot.say('**Ok.** I changed the game to **{0}**'.format(gameName))
         else:
-            await self.bot.say('**No.**! Admin only command')
+            await self.bot.say('**No!** Owner only command')
 
 
     #this should change bot's avatar, like, who knows what it does really
     @commands.command(pass_context=True)
     @checks.is_owner()
     async def avatar(self, ctx, url: str):
-        '''Sets new avatar for Luna'''
+        """Sets new avatar for Luna"""
         #async with aiohttp.get(''.join(url)) as img:
         #   with open('tempAva.png', 'wb') as f:
         #       f.write(await img.read())
@@ -112,7 +139,7 @@ class Admin:
     @commands.command(pass_context=True)
     @checks.is_owner()
     async def name(self, ctx, *name):
-        '''Changes Bot Name'''
+        """Changes Bot Name"""
         if ctx.message.channel.permissions_for(ctx.message.author).administrator:
             name = ' '.join(name)
             await self.bot.edit_profile(username=name)

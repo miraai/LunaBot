@@ -30,6 +30,7 @@ initial_extensions = [
     'cogs.admin',
     'cogs.buttons',
     'cogs.customreactions',
+    'cogs.music'
 ]
 #so these should be kinda modules/plugins
 
@@ -45,9 +46,16 @@ log.addHandler(handler)
 
 help_attrs = dict(hidden=True)
 
+#loads bot credentials.json as file. Takes client_id, carbon_key and bots_key=client_id now (i will fix it)
+#if id is missing, it wont load the file
+def load_credentials():
+    with open('credentials.json') as f:
+        return json.load(f)
+
 #prefix, can be either ? or !
-prefix = ['?', '!', '\N{HEAVY EXCLAMATION MARK SYMBOL}']
+prefix = load_credentials()["prefix"]
 bot = commands.Bot(command_prefix=prefix, description=description, pm_help=None, help_attrs=help_attrs)
+
 
 #still not clear with what these events are for, i assume its something like even handlers or whatever
 #so basically, if the command which can not be used in DM is used there, bot sends the message that it cant be used
@@ -117,12 +125,6 @@ async def do(ctx, times : int, *, command):
 async def changelog():
     """Gives a URL to the current bot changelog."""
     await bot.say('https://discord.gg/y2PcWMM')
-
-#loads bot credentials.json as file. Takes client_id, carbon_key and bots_key=client_id now (i will fix it)
-#if id is missing, it wont load the file
-def load_credentials():
-    with open('credentials.json') as f:
-        return json.load(f)
 
 if __name__ == '__main__':
     if any('debug' in arg.lower() for arg in sys.argv):
