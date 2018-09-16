@@ -98,3 +98,5 @@ ENV/
 .idea/**
 .data/**
 credentials.json
+.tests/**
+.cogs/__pycache__
