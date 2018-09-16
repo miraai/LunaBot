@@ -1,5 +1,4 @@
-# content of test_sample.py
-def test_answer(cmdopt):
+def test_allservers(cmdopt):
     if cmdopt == "allservers":
         print("ctx.message.author, toReturn")
     elif cmdopt != "allservers":

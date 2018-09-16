@@ -2,7 +2,7 @@ from discord.ext import commands
 from datetime import datetime
 import discord
 from .utils import checks
-
+import random
 
 
 class Buttons:
@@ -24,7 +24,15 @@ class Buttons:
     @commands.command()
     async def love(self):
         """What is love?"""
-        await self.bot.say('http://i.imgur.com/ZSSSMqY.gif')
+        responses = [
+            'https://www.youtube.com/watch?v=HEXWRTEbj1I',
+            'https://www.youtube.com/watch?v=i0p1bmr0EmE',
+            'an intense feeling of deep affection',
+            'something we don\'t have'
+        ]
+
+        response = random.choice(responses)
+        await self.bot.say(response)
 
     @commands.command()
     async def bored(self):

@@ -13,9 +13,6 @@ setup(
         'lxml',
         'pytest'
     ],
-    setup_requires=[
-        'pytest_runner'
-    ],
     tests_require=["pytest"],
     zip_safe=False,
 )

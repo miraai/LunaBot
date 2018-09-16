@@ -13,7 +13,7 @@ from collections import Counter
 logging.basicConfig(level=logging.INFO)
 
 description = """
-Mirai made a lunatic! RUN!
+nico and the niners
 """
 #HERE BE DRAGONS
 
