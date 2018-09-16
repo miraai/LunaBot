@@ -1,0 +1,6 @@
+{
+    "AVCONV" : false,
+    "SERVERS" : {},
+    "SOUNDCLOUD_CLIENT_ID" : null,
+    "VOLUME" : 50
+}

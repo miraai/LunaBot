@@ -1,5 +1,5 @@
 ## LunaBot
-You should only main configuration file while the rest will be created automatically.
+You should only create main configuration file while the rest will be created automatically.
 
 Its a credentials.json file with the credentials:
 
@@ -7,6 +7,6 @@ Its a credentials.json file with the credentials:
 {
     "token": "your bot token",
     "client_id": "your client_id",
-    "carbon_key": "the key for carbonitex"
+    "prefix": "?"
 }
 ```
